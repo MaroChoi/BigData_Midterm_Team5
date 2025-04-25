@@ -155,3 +155,46 @@ plt.title('Correlation Matrix')
 plt.tight_layout()
 plt.savefig("correlation_matrix.png")
 plt.show()
+
+#13. 모델 활성화 및 평가 RandomForestClassifier 로 결정
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.metrics import classification_report, accuracy_score, confusion_matrix
+
+# 독립변수(X)와 종속변수(y) 설정
+X = df.drop(columns=['high_achiever', 'pass_math', 'total_score', 'average_score'])  # 분석 목적 외 변수 제거
+y = df['high_achiever']  # 예측 목표: 고득점 여부
+
+# 학습/테스트 분리
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 랜덤포레스트 모델 정의 및 학습
+rf_model = RandomForestClassifier(n_estimators=100, max_depth=None, random_state=42)
+rf_model.fit(X_train, y_train)
+
+# 예측
+y_pred = rf_model.predict(X_test)
+
+# 성능 평가
+print("📊 정확도 (Accuracy):", accuracy_score(y_test, y_pred))
+print("📊 분류 리포트:\n", classification_report(y_test, y_pred))
+print("📊 혼동 행렬:\n", confusion_matrix(y_test, y_pred))
+
+cv_scores = cross_val_score(rf_model, X, y, cv=5, scoring='accuracy')
+print(f"📈 교차검증 평균 정확도: {cv_scores.mean():.4f}")
+
+importances = rf_model.feature_importances_
+features = X.columns
+
+# 중요도 정렬
+indices = np.argsort(importances)[::-1]
+
+# 시각화
+plt.figure(figsize=(10, 6))
+sns.barplot(x=importances[indices], y=features[indices])
+plt.title("📌 Feature Importance (RandomForest)")
+plt.xlabel("Importance Score")
+plt.ylabel("Features")
+plt.tight_layout()
+plt.savefig("randomforest_feature_importance.png")
+plt.show()
