@@ -43,6 +43,13 @@ def missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_n
                 df[col] = df[col].fillna('Unknown')
     return df
 
+# 추가: Unknown 또는 NaN이 있는 행 삭제 함수
+def drop_unknown_or_nan_rows(df, unknown_value='Unknown'):
+    df = df.copy()
+    condition = df.isnull().any(axis=1) | df.isin([unknown_value]).any(axis=1)
+    df_cleaned = df[~condition].reset_index(drop=True)
+    return df_cleaned
+
 # 3단계: 수치형 이상치 제거 함수 (IQR 방식)
 def remove_outliers_iqr(df, numerical_cols):
     df = df.copy()
@@ -112,6 +119,9 @@ df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_
 # 원하는 컬럼만 선택해서 새로운 DataFrame 만들기
 selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']
 df_selected = df[selected_columns]
+
+# 추가: unkown+nan 제거
+df_selected = drop_unknown_or_nan_rows(df_selected)
 
 # 파생변수 생성 / gpt에 물어봐서 추가
 df_selected['새로운_파생변수'] = df_selected['원하는 컬럼1'] / (df_selected['원하는 컬럼2'] + 1)
