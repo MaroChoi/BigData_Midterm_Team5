@@ -1,6 +1,6 @@
 # BigData_Midterm_Team5
 BigData_Midterm_Team5
-
+# 각각 200자 이내로 작성해주세요.
 # 1번 문제 Readme
 결측치 처리 방법
 
