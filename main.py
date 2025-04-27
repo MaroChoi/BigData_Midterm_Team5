@@ -1,4 +1,4 @@
-# 📦 전체 파이프라인 함수 모음 (Full Functions)
+ 📦 전체 파이프라인 함수 모음 (Full Functions)
 
 import pandas as pd
 import numpy as np
@@ -103,9 +103,11 @@ def normalization_handler(df, numerical_cols, scaler_type='minmax'):
 
 
 def some_function(input_file):
+    import os
+
     # 사용자 지정 부분 (원하는 컬럼들)
-    selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']  # 수정 필요
-    numerical_cols = ['수치형 컬럼1', '수치형 컬럼2']  # 수정 필요
+    selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']  # ✨ 수정 필요
+    numerical_cols = ['수치형 컬럼1', '수치형 컬럼2']  # ✨ 수정 필요
     ordinal_numeric_cols = []
     nominal_numeric_cols = []
     ordinal_string_cols = []
@@ -126,33 +128,50 @@ def some_function(input_file):
     # Unknown/Nan 행 삭제
     df_selected = drop_unknown_or_nan_rows(df_selected)
 
-    # ✨ 파생변수 추가 (예시)
+    # ✨ 파생변수 추가
     df_selected['새로운_파생변수'] = df_selected['원하는 컬럼1'] / (df_selected['원하는 컬럼2'] + 1)
 
-    # ➡️ 새로 만든 파생변수를 수치형 컬럼 리스트에 추가
-    numerical_cols.append('새로운_파생변수')
+    # 5개 그룹 재분리 (※ 여기 중요)
+    numerical_cols_selected = [col for col in numerical_cols if col in df_selected.columns]
+    ordinal_numeric_cols_selected = [col for col in ordinal_numeric_cols if col in df_selected.columns]
+    nominal_numeric_cols_selected = [col for col in nominal_numeric_cols if col in df_selected.columns]
+    ordinal_string_cols_selected = [col for col in ordinal_string_cols if col in df_selected.columns]
+    nominal_string_cols_selected = [col for col in nominal_string_cols if col in df_selected.columns]
 
-    # 범주형 인코딩
+    # 새로 만든 파생변수 추가
+    numerical_cols_selected.append('새로운_파생변수')
+
+    # 4단계: 범주형 인코딩
     df_encoded = df_selected.copy()
-    if ordinal_numeric_cols:
-        df_encoded = encode_ordinal_numeric(df_encoded, ordinal_numeric_cols)
-    if nominal_numeric_cols:
-        df_encoded = encode_nominal_numeric(df_encoded, nominal_numeric_cols)
-    if ordinal_string_cols:
-        df_encoded = encode_ordinal_string(df_encoded, ordinal_string_cols)
-    if nominal_string_cols:
-        df_encoded = encode_nominal_string(df_encoded, nominal_string_cols)
+    if ordinal_numeric_cols_selected:
+        df_encoded = encode_ordinal_numeric(df_encoded, ordinal_numeric_cols_selected)
+    if nominal_numeric_cols_selected:
+        df_encoded = encode_nominal_numeric(df_encoded, nominal_numeric_cols_selected)
+    if ordinal_string_cols_selected:
+        df_encoded = encode_ordinal_string(df_encoded, ordinal_string_cols_selected)
+    if nominal_string_cols_selected:
+        df_encoded = encode_nominal_string(df_encoded, nominal_string_cols_selected)
 
-    # 정규화
-    df_encoded = normalization_handler(df_encoded, numerical_cols=numerical_cols, scaler_type='minmax')
+    # 정규화 (※ 여기 수정!!)
+    df_encoded = normalization_handler(df_encoded, numerical_cols=numerical_cols_selected, scaler_type='minmax')
 
-    # 저장
-    output_file = 'preprocessed_' + input_file
-    df_encoded.to_csv(output_file, index=False)
-    return output_file
+    # ✨ (필요하면 여기서 target 추가 가능)
+
+    # 최종 저장
+    save_folder = os.path.expanduser('~/Downloads')  # 맥북 기본 Downloads 폴더
+    save_filename = 'final_preprocessed_data.csv'
+    output_path = os.path.join(save_folder, save_filename)
+    df_encoded.to_csv(output_path, index=False)
+
+    # 결과 확인
+    print("\n✅ 최종 데이터프레임:")
+    print(df_encoded.head())
+    print(f"\n✅ 최종 데이터 저장 완료! 저장 위치: {output_path}")
+
+    return df_encoded
 
 # 🔥 전체 파이프라인 실행 예시 (아래 코드 추가)
-
+df = pd.read_csv('파일')
 # 1단계: 고유값 확인
 inspect_unique_values(df)
 

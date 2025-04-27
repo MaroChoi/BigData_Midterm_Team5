@@ -1,5 +1,5 @@
 # 📦 전체 파이프라인 함수 모음 (Full Functions)
-import os
+
 import pandas as pd
 import numpy as np
 import re
@@ -103,12 +103,16 @@ def normalization_handler(df, numerical_cols, scaler_type='minmax'):
 
 
 def some_function(input_file):
+    import os
+
     # 사용자 지정 부분 (원하는 컬럼들)
-    numerical_cols = ['world_rank', 'national_rank', 'quality_of_education', 'alumni_employment','quality_of_faculty', 'publications', 'influence', 'citations', 'broad_impact', 'patents', 'score']
+    selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']  # ✨ 수정 필요
+    numerical_cols = ['수치형 컬럼1', '수치형 컬럼2']  # ✨ 수정 필요
     ordinal_numeric_cols = []
     nominal_numeric_cols = []
-    ordinal_string_cols = ['year']
-    nominal_string_cols = ['institution', 'country']
+    ordinal_string_cols = []
+    nominal_string_cols = []
+
     # 파일 불러오기
     df = pd.read_csv(input_file)
 
@@ -116,7 +120,6 @@ def some_function(input_file):
     df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_numeric_cols, ordinal_string_cols, nominal_string_cols)
 
     # 필요한 컬럼만 선택
-    selected_columns = ['score', 'world_rank', 'patents']
     df_selected = df[selected_columns]
 
     # 이상치 제거
@@ -125,18 +128,18 @@ def some_function(input_file):
     # Unknown/Nan 행 삭제
     df_selected = drop_unknown_or_nan_rows(df_selected)
 
-    # 파생변수 생성
-    df_selected['score_per_rank'] = df_selected['score'] / (df_selected['world_rank'] + 1)
+    # ✨ 파생변수 추가
+    df_selected['새로운_파생변수'] = df_selected['원하는 컬럼1'] / (df_selected['원하는 컬럼2'] + 1)
 
-    # 5개 그룹 재분리
+    # 5개 그룹 재분리 (※ 여기 중요)
     numerical_cols_selected = [col for col in numerical_cols if col in df_selected.columns]
     ordinal_numeric_cols_selected = [col for col in ordinal_numeric_cols if col in df_selected.columns]
     nominal_numeric_cols_selected = [col for col in nominal_numeric_cols if col in df_selected.columns]
     ordinal_string_cols_selected = [col for col in ordinal_string_cols if col in df_selected.columns]
     nominal_string_cols_selected = [col for col in nominal_string_cols if col in df_selected.columns]
-    
+
     # 새로 만든 파생변수 추가
-    numerical_cols_selected.append('score_per_rank')
+    numerical_cols_selected.append('새로운_파생변수')
 
     # 4단계: 범주형 인코딩
     df_encoded = df_selected.copy()
@@ -147,19 +150,14 @@ def some_function(input_file):
     if ordinal_string_cols_selected:
         df_encoded = encode_ordinal_string(df_encoded, ordinal_string_cols_selected)
     if nominal_string_cols_selected:
-        df_encoded = encode_nominal_string(df_encoded, nominal_string_cols_selected)    
+        df_encoded = encode_nominal_string(df_encoded, nominal_string_cols_selected)
 
-    # 정규화
+    # 정규화 (※ 여기 수정!!)
     df_encoded = normalization_handler(df_encoded, numerical_cols=numerical_cols_selected, scaler_type='minmax')
 
-    df_encoded['good_university'] = (
-    (df_selected['score'] >= 85).astype(int) +
-    (df_selected['world_rank'] <= 300).astype(int) +
-    (df_selected['patents'] >= 50).astype(int))
-    
-    df_encoded['good_university'] = df_encoded['good_university'].apply(lambda x: 1 if x >= 2 else 0)
+    # ✨ (필요하면 여기서 target 추가 가능)
 
-     # 최종 저장
+    # 최종 저장
     save_folder = os.path.expanduser('~/Downloads')  # 맥북 기본 Downloads 폴더
     save_filename = 'final_preprocessed_data.csv'
     output_path = os.path.join(save_folder, save_filename)
@@ -172,6 +170,64 @@ def some_function(input_file):
 
     return df_encoded
 
+# 🔥 전체 파이프라인 실행 예시 (아래 코드 추가)
+df = pd.read_csv('파일')
+# 1단계: 고유값 확인
+inspect_unique_values(df)
 
-input_file = '/Users/imsu-in/Downloads/myproject/midtermtest/BigData_Midterm_Team5/BigData_Midterm_Team5-2/Data_9/cwurData.csv'
-output_file = some_function(input_file)
+# 컬럼 직접 구분
+numerical_cols = ['수치형 컬럼 이름1', '수치형 컬럼 이름2']
+ordinal_numeric_cols = ['범주형(숫자, 순서 상관 있음) 컬럼 이름1']
+nominal_numeric_cols = ['범주형(숫자, 순서 상관 없음) 컬럼 이름1']
+ordinal_string_cols = ['범주형(명목, 순서 상관 있음) 컬럼 이름1']
+nominal_string_cols = ['범주형(명목, 순서 없음) 컬럼 이름1']
+
+# 2단계: 결측치 처리
+df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_numeric_cols, ordinal_string_cols, nominal_string_cols)
+
+# 원하는 컬럼만 선택해서 새로운 DataFrame 만들기
+selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']
+df_selected = df[selected_columns]
+
+# 추가: unkown+nan 제거
+df_selected = drop_unknown_or_nan_rows(df_selected)
+
+# 파생변수 생성 / gpt에 물어봐서 추가
+df_selected['새로운_파생변수'] = df_selected['원하는 컬럼1'] / (df_selected['원하는 컬럼2'] + 1)
+
+# 3단계: 수치형 컬럼만 이상치 제거 (IQR)
+df_selected = remove_outliers_iqr(df_selected, [col for col in numerical_cols if col in df_selected.columns])
+
+# 5개 그룹 재분리
+numerical_cols_selected = [col for col in numerical_cols if col in df_selected.columns]
+ordinal_numeric_cols_selected = [col for col in ordinal_numeric_cols if col in df_selected.columns]
+nominal_numeric_cols_selected = [col for col in nominal_numeric_cols if col in df_selected.columns]
+ordinal_string_cols_selected = [col for col in ordinal_string_cols if col in df_selected.columns]
+nominal_string_cols_selected = [col for col in nominal_string_cols if col in df_selected.columns]
+
+# 새로 만든 파생변수 추가
+numerical_cols_selected.append('새로운_파생변수')
+
+# 4단계: 범주형 인코딩
+df_encoded = df_selected.copy()
+if ordinal_numeric_cols_selected:
+    df_encoded = encode_ordinal_numeric(df_encoded, ordinal_numeric_cols_selected)
+if nominal_numeric_cols_selected:
+    df_encoded = encode_nominal_numeric(df_encoded, nominal_numeric_cols_selected)
+if ordinal_string_cols_selected:
+    df_encoded = encode_ordinal_string(df_encoded, ordinal_string_cols_selected)
+if nominal_string_cols_selected:
+    df_encoded = encode_nominal_string(df_encoded, nominal_string_cols_selected)
+
+# 5단계: 정규화 적용 (수치형 컬럼 기준, MinMaxScaler 또는 StandardScaler(logistic regression, linear regression) 선택)
+scaler_type = 'minmax'  # 'minmax' 또는 'standard' 중 선택 가능
+df_encoded = normalization_handler(df_encoded, numerical_cols_selected, scaler_type=scaler_type)
+
+# 결과 확인
+print("\n✅ 최종 데이터프레임:")
+print(df_encoded.head())
+
+# ✨ 최종 데이터 저장
+output_path = 'final_preprocessed_data.csv'
+df_encoded.to_csv(output_path, index=False)
+print(f"\n✅ 최종 데이터 저장 완료: {output_path}")
