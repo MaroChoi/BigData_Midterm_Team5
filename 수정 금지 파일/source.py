@@ -227,6 +227,12 @@ df_encoded = normalization_handler(df_encoded, numerical_cols_selected, scaler_t
 print("\n✅ 최종 데이터프레임:")
 print(df_encoded.head())
 
+# 최종 저장
+save_folder = os.path.expanduser('~/Downloads')  # 맥북 기본 Downloads 폴더
+save_filename = 'final_preprocessed_data.csv'
+output_path = os.path.join(save_folder, save_filename)
+df_encoded.to_csv(output_path, index=False)
+
 # ✨ 최종 데이터 저장
 output_path = 'final_preprocessed_data.csv'
 df_encoded.to_csv(output_path, index=False)
