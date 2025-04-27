@@ -106,7 +106,6 @@ def some_function(input_file):
     import os
 
     # 사용자 지정 부분 (원하는 컬럼들)
-    selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']  # ✨ 수정 필요
     numerical_cols = ['수치형 컬럼1', '수치형 컬럼2']  # ✨ 수정 필요
     ordinal_numeric_cols = []
     nominal_numeric_cols = []
@@ -120,6 +119,7 @@ def some_function(input_file):
     df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_numeric_cols, ordinal_string_cols, nominal_string_cols)
 
     # 필요한 컬럼만 선택
+    selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']  # ✨ 수정 필요
     df_selected = df[selected_columns]
 
     # 이상치 제거
