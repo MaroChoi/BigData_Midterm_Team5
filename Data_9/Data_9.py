@@ -170,7 +170,7 @@ def some_function(input_file):
     print(df_encoded.head())
     print(f"\n✅ 최종 데이터 저장 완료! 저장 위치: {output_path}")
 
-    return df_encoded
+    return output_path
 
 
 input_file = '/Users/imsu-in/Downloads/myproject/midtermtest/BigData_Midterm_Team5/BigData_Midterm_Team5-2/Data_9/cwurData.csv'
