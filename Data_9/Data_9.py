@@ -9,6 +9,12 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, r2_score, mean_squared_error
 
+
+import matplotlib.pyplot as plt  # EDA 시각화용
+import seaborn as sns            # EDA 시각화용
+
+
+
 # 1단계: 컬럼별 고유값 출력 함수
 def inspect_unique_values(df, max_display=10):
     for col in df.columns:

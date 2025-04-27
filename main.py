@@ -9,6 +9,73 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, r2_score, mean_squared_error
 
+import matplotlib.pyplot as plt  # EDA 시각화용
+import seaborn as sns            # EDA 시각화용
+
+# 6단계: EDA 시각화 함수
+def plot_categorical_distributions(df, categorical_cols):
+    for col in categorical_cols:
+        if col in df.columns:
+            plt.figure(figsize=(6,4))
+            sns.countplot(x=col, data=df)
+            plt.title(f'Count Plot of {col}')
+            plt.xticks(rotation=45)
+            plt.show()
+
+def plot_missing_heatmap(df):
+    plt.figure(figsize=(10,6))
+    sns.heatmap(df.isnull(), cbar=False, cmap="viridis")
+    plt.title('Missing Value Heatmap')
+    plt.show()
+
+def plot_boxplots(df, numerical_cols):
+    for col in numerical_cols:
+        if col in df.columns:
+            plt.figure(figsize=(6,4))
+            sns.boxplot(x=df[col])
+            plt.title(f'Boxplot of {col}')
+            plt.show()
+
+def plot_numeric_distributions(df, numerical_cols):
+    for col in numerical_cols:
+        if col in df.columns:
+            plt.figure(figsize=(6,4))
+            sns.histplot(df[col], kde=True, bins=30)
+            plt.title(f'Distribution of {col}')
+            plt.xlabel(col)
+            plt.ylabel('Count')
+            plt.show()
+
+def plot_correlation_heatmap(df, numerical_cols):
+    if len(numerical_cols) > 1:
+        plt.figure(figsize=(8,6))
+        corr = df[numerical_cols].corr()
+        sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f")
+        plt.title('Correlation Heatmap')
+        plt.show()
+
+def run_eda(df, numerical_cols, categorical_cols=None):
+    print("\n📊 [1/5] 결측치 히트맵")
+    plot_missing_heatmap(df)
+
+    print("\n📊 [2/5] 수치형 컬럼 Boxplot")
+    plot_boxplots(df, numerical_cols)
+
+    print("\n📊 [3/5] 수치형 변수 분포 (Histplot)")
+    plot_numeric_distributions(df, numerical_cols)
+
+    if categorical_cols:
+        print("\n📊 [4/5] 범주형 변수 Count Plot")
+        plot_categorical_distributions(df, categorical_cols)
+
+    print("\n📊 [5/5] 수치형 변수 간 상관관계 (Heatmap)")
+    plot_correlation_heatmap(df, numerical_cols)
+
+    print("\n✅ EDA 시각화 완료.")
+
+
+
+
 # 1단계: 컬럼별 고유값 출력 함수
 def inspect_unique_values(df, max_display=10):
     for col in df.columns:
