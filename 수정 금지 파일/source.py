@@ -168,7 +168,7 @@ def some_function(input_file):
     print(df_encoded.head())
     print(f"\n✅ 최종 데이터 저장 완료! 저장 위치: {output_path}")
 
-    return df_encoded
+    return output_path
 
 # 🔥 전체 파이프라인 실행 예시 (아래 코드 추가)
 df = pd.read_csv('파일')
