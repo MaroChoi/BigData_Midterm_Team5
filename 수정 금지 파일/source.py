@@ -1,5 +1,5 @@
 # 📦 전체 파이프라인 함수 모음 (Full Functions)
-
+import os
 import pandas as pd
 import numpy as np
 import re
