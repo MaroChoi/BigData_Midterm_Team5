@@ -9,70 +9,9 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, r2_score, mean_squared_error
 
+
 import matplotlib.pyplot as plt  # EDA 시각화용
 import seaborn as sns            # EDA 시각화용
-
-# 6단계: EDA 시각화 함수
-def plot_categorical_distributions(df, categorical_cols):
-    for col in categorical_cols:
-        if col in df.columns:
-            plt.figure(figsize=(6,4))
-            sns.countplot(x=col, data=df)
-            plt.title(f'Count Plot of {col}')
-            plt.xticks(rotation=45)
-            plt.show()
-
-def plot_missing_heatmap(df):
-    plt.figure(figsize=(10,6))
-    sns.heatmap(df.isnull(), cbar=False, cmap="viridis")
-    plt.title('Missing Value Heatmap')
-    plt.show()
-
-def plot_boxplots(df, numerical_cols):
-    for col in numerical_cols:
-        if col in df.columns:
-            plt.figure(figsize=(6,4))
-            sns.boxplot(x=df[col])
-            plt.title(f'Boxplot of {col}')
-            plt.show()
-
-def plot_numeric_distributions(df, numerical_cols):
-    for col in numerical_cols:
-        if col in df.columns:
-            plt.figure(figsize=(6,4))
-            sns.histplot(df[col], kde=True, bins=30)
-            plt.title(f'Distribution of {col}')
-            plt.xlabel(col)
-            plt.ylabel('Count')
-            plt.show()
-
-def plot_correlation_heatmap(df, numerical_cols):
-    if len(numerical_cols) > 1:
-        plt.figure(figsize=(8,6))
-        corr = df[numerical_cols].corr()
-        sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f")
-        plt.title('Correlation Heatmap')
-        plt.show()
-
-def run_eda(df, numerical_cols, categorical_cols=None):
-    print("\n📊 [1/5] 결측치 히트맵")
-    plot_missing_heatmap(df)
-
-    print("\n📊 [2/5] 수치형 컬럼 Boxplot")
-    plot_boxplots(df, numerical_cols)
-
-    print("\n📊 [3/5] 수치형 변수 분포 (Histplot)")
-    plot_numeric_distributions(df, numerical_cols)
-
-    if categorical_cols:
-        print("\n📊 [4/5] 범주형 변수 Count Plot")
-        plot_categorical_distributions(df, categorical_cols)
-
-    print("\n📊 [5/5] 수치형 변수 간 상관관계 (Heatmap)")
-    plot_correlation_heatmap(df, numerical_cols)
-
-    print("\n✅ EDA 시각화 완료.")
-
 
 
 
@@ -170,15 +109,12 @@ def normalization_handler(df, numerical_cols, scaler_type='minmax'):
 
 
 def some_function(input_file):
-    import os
-
     # 사용자 지정 부분 (원하는 컬럼들)
-    numerical_cols = ['수치형 컬럼1', '수치형 컬럼2']  # ✨ 수정 필요
+    numerical_cols = ['world_rank', 'national_rank', 'quality_of_education', 'alumni_employment','quality_of_faculty', 'publications', 'influence', 'citations', 'broad_impact', 'patents', 'score']
     ordinal_numeric_cols = []
     nominal_numeric_cols = []
-    ordinal_string_cols = []
-    nominal_string_cols = []
-
+    ordinal_string_cols = ['year']
+    nominal_string_cols = ['institution', 'country']
     # 파일 불러오기
     df = pd.read_csv(input_file)
 
@@ -186,7 +122,7 @@ def some_function(input_file):
     df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_numeric_cols, ordinal_string_cols, nominal_string_cols)
 
     # 필요한 컬럼만 선택
-    selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']  # ✨ 수정 필요
+    selected_columns = ['score', 'world_rank', 'patents']
     df_selected = df[selected_columns]
 
     # 이상치 제거
@@ -195,18 +131,18 @@ def some_function(input_file):
     # Unknown/Nan 행 삭제
     df_selected = drop_unknown_or_nan_rows(df_selected)
 
-    # ✨ 파생변수 추가
-    df_selected['새로운_파생변수'] = df_selected['원하는 컬럼1'] / (df_selected['원하는 컬럼2'] + 1)
+    # 파생변수 생성
+    df_selected['score_per_rank'] = df_selected['score'] / (df_selected['world_rank'] + 1)
 
-    # 5개 그룹 재분리 (※ 여기 중요)
+    # 5개 그룹 재분리
     numerical_cols_selected = [col for col in numerical_cols if col in df_selected.columns]
     ordinal_numeric_cols_selected = [col for col in ordinal_numeric_cols if col in df_selected.columns]
     nominal_numeric_cols_selected = [col for col in nominal_numeric_cols if col in df_selected.columns]
     ordinal_string_cols_selected = [col for col in ordinal_string_cols if col in df_selected.columns]
     nominal_string_cols_selected = [col for col in nominal_string_cols if col in df_selected.columns]
-
+    
     # 새로 만든 파생변수 추가
-    numerical_cols_selected.append('새로운_파생변수')
+    numerical_cols_selected.append('score_per_rank')
 
     # 4단계: 범주형 인코딩
     df_encoded = df_selected.copy()
@@ -217,14 +153,19 @@ def some_function(input_file):
     if ordinal_string_cols_selected:
         df_encoded = encode_ordinal_string(df_encoded, ordinal_string_cols_selected)
     if nominal_string_cols_selected:
-        df_encoded = encode_nominal_string(df_encoded, nominal_string_cols_selected)
+        df_encoded = encode_nominal_string(df_encoded, nominal_string_cols_selected)    
 
-    # 정규화 (※ 여기 수정!!)
+    # 정규화
     df_encoded = normalization_handler(df_encoded, numerical_cols=numerical_cols_selected, scaler_type='minmax')
 
-    # ✨ (필요하면 여기서 target 추가 가능)
+    df_encoded['good_university'] = (
+    (df_selected['score'] >= 85).astype(int) +
+    (df_selected['world_rank'] <= 300).astype(int) +
+    (df_selected['patents'] >= 50).astype(int))
+    
+    df_encoded['good_university'] = df_encoded['good_university'].apply(lambda x: 1 if x >= 2 else 0)
 
-    # 최종 저장
+     # 최종 저장
     save_folder = os.path.expanduser('~/Downloads')  # 맥북 기본 Downloads 폴더
     save_filename = 'final_preprocessed_data.csv'
     output_path = os.path.join(save_folder, save_filename)
@@ -235,72 +176,8 @@ def some_function(input_file):
     print(df_encoded.head())
     print(f"\n✅ 최종 데이터 저장 완료! 저장 위치: {output_path}")
 
-    return df_encoded
+    return output_path
 
-# 🔥 전체 파이프라인 실행 예시 (아래 코드 추가)
-df = pd.read_csv('파일')
-# 1단계: 고유값 확인
-inspect_unique_values(df)
 
-# 컬럼 직접 구분
-numerical_cols = ['수치형 컬럼 이름1', '수치형 컬럼 이름2']
-ordinal_numeric_cols = ['범주형(숫자, 순서 상관 있음) 컬럼 이름1']
-nominal_numeric_cols = ['범주형(숫자, 순서 상관 없음) 컬럼 이름1']
-ordinal_string_cols = ['범주형(명목, 순서 상관 있음) 컬럼 이름1']
-nominal_string_cols = ['범주형(명목, 순서 없음) 컬럼 이름1']
-
-# 2단계: 결측치 처리
-df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_numeric_cols, ordinal_string_cols, nominal_string_cols)
-
-# 원하는 컬럼만 선택해서 새로운 DataFrame 만들기
-selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']
-df_selected = df[selected_columns]
-
-# 추가: unkown+nan 제거
-df_selected = drop_unknown_or_nan_rows(df_selected)
-
-# 파생변수 생성 / gpt에 물어봐서 추가
-df_selected['새로운_파생변수'] = df_selected['원하는 컬럼1'] / (df_selected['원하는 컬럼2'] + 1)
-
-# 3단계: 수치형 컬럼만 이상치 제거 (IQR)
-df_selected = remove_outliers_iqr(df_selected, [col for col in numerical_cols if col in df_selected.columns])
-
-# 5개 그룹 재분리
-numerical_cols_selected = [col for col in numerical_cols if col in df_selected.columns]
-ordinal_numeric_cols_selected = [col for col in ordinal_numeric_cols if col in df_selected.columns]
-nominal_numeric_cols_selected = [col for col in nominal_numeric_cols if col in df_selected.columns]
-ordinal_string_cols_selected = [col for col in ordinal_string_cols if col in df_selected.columns]
-nominal_string_cols_selected = [col for col in nominal_string_cols if col in df_selected.columns]
-
-# 새로 만든 파생변수 추가
-numerical_cols_selected.append('새로운_파생변수')
-
-# 4단계: 범주형 인코딩
-df_encoded = df_selected.copy()
-if ordinal_numeric_cols_selected:
-    df_encoded = encode_ordinal_numeric(df_encoded, ordinal_numeric_cols_selected)
-if nominal_numeric_cols_selected:
-    df_encoded = encode_nominal_numeric(df_encoded, nominal_numeric_cols_selected)
-if ordinal_string_cols_selected:
-    df_encoded = encode_ordinal_string(df_encoded, ordinal_string_cols_selected)
-if nominal_string_cols_selected:
-    df_encoded = encode_nominal_string(df_encoded, nominal_string_cols_selected)
-
-# 5단계: 정규화 적용 (수치형 컬럼 기준, MinMaxScaler 또는 StandardScaler(logistic regression, linear regression) 선택)
-scaler_type = 'standard'  # 'minmax' 또는 'standard' 중 선택 가능
-df_encoded = normalization_handler(df_encoded, numerical_cols_selected, scaler_type=scaler_type)
-
-# 결과 확인
-print("\n✅ 최종 데이터프레임:")
-print(df_encoded.head())
-
- # 최종 저장
-save_folder = os.path.expanduser('~/Downloads')  # 맥북 기본 Downloads 폴더
-save_filename = 'final_preprocessed_data.csv'
-output_path = os.path.join(save_folder, save_filename)
-df_encoded.to_csv(output_path, index=False)
-
-# ✨ 최종 데이터 저장
-output_path = 'final_preprocessed_data.csv'
-df_encoded.to_csv(output_path, index=False)
-print(f"\n✅ 최종 데이터 저장 완료: {output_path}")
+input_file = '/Users/imsu-in/Downloads/myproject/midtermtest/BigData_Midterm_Team5/BigData_Midterm_Team5-2/Data_9/cwurData.csv'
+output_file = some_function(input_file)

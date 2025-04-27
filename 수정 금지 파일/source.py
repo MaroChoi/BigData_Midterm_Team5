@@ -9,6 +9,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, r2_score, mean_squared_error
 
+
 import matplotlib.pyplot as plt  # EDA 시각화용
 import seaborn as sns            # EDA 시각화용
 
@@ -72,8 +73,6 @@ def run_eda(df, numerical_cols, categorical_cols=None):
     plot_correlation_heatmap(df, numerical_cols)
 
     print("\n✅ EDA 시각화 완료.")
-
-
 
 
 # 1단계: 컬럼별 고유값 출력 함수
@@ -235,7 +234,7 @@ def some_function(input_file):
     print(df_encoded.head())
     print(f"\n✅ 최종 데이터 저장 완료! 저장 위치: {output_path}")
 
-    return df_encoded
+    return output_path
 
 # 🔥 전체 파이프라인 실행 예시 (아래 코드 추가)
 df = pd.read_csv('파일')
@@ -287,14 +286,14 @@ if nominal_string_cols_selected:
     df_encoded = encode_nominal_string(df_encoded, nominal_string_cols_selected)
 
 # 5단계: 정규화 적용 (수치형 컬럼 기준, MinMaxScaler 또는 StandardScaler(logistic regression, linear regression) 선택)
-scaler_type = 'standard'  # 'minmax' 또는 'standard' 중 선택 가능
+scaler_type = 'minmax'  # 'minmax' 또는 'standard' 중 선택 가능
 df_encoded = normalization_handler(df_encoded, numerical_cols_selected, scaler_type=scaler_type)
 
 # 결과 확인
 print("\n✅ 최종 데이터프레임:")
 print(df_encoded.head())
 
- # 최종 저장
+# 최종 저장
 save_folder = os.path.expanduser('~/Downloads')  # 맥북 기본 Downloads 폴더
 save_filename = 'final_preprocessed_data.csv'
 output_path = os.path.join(save_folder, save_filename)
