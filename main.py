@@ -101,6 +101,56 @@ def normalization_handler(df, numerical_cols, scaler_type='minmax'):
     df[numerical_cols] = scaler.fit_transform(df[numerical_cols])
     return df
 
+
+def some_function(input_file):
+    # 사용자 지정 부분 (원하는 컬럼들)
+    selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']  # 수정 필요
+    numerical_cols = ['수치형 컬럼1', '수치형 컬럼2']  # 수정 필요
+    ordinal_numeric_cols = []
+    nominal_numeric_cols = []
+    ordinal_string_cols = []
+    nominal_string_cols = []
+
+    # 파일 불러오기
+    df = pd.read_csv(input_file)
+
+    # 결측치 및 중복 처리
+    df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_numeric_cols, ordinal_string_cols, nominal_string_cols)
+
+    # 필요한 컬럼만 선택
+    df_selected = df[selected_columns]
+
+    # 이상치 제거
+    df_selected = remove_outliers_iqr(df_selected, numerical_cols=[col for col in numerical_cols if col in df_selected.columns])
+
+    # Unknown/Nan 행 삭제
+    df_selected = drop_unknown_or_nan_rows(df_selected)
+
+    # ✨ 파생변수 추가 (예시)
+    df_selected['새로운_파생변수'] = df_selected['원하는 컬럼1'] / (df_selected['원하는 컬럼2'] + 1)
+
+    # ➡️ 새로 만든 파생변수를 수치형 컬럼 리스트에 추가
+    numerical_cols.append('새로운_파생변수')
+
+    # 범주형 인코딩
+    df_encoded = df_selected.copy()
+    if ordinal_numeric_cols:
+        df_encoded = encode_ordinal_numeric(df_encoded, ordinal_numeric_cols)
+    if nominal_numeric_cols:
+        df_encoded = encode_nominal_numeric(df_encoded, nominal_numeric_cols)
+    if ordinal_string_cols:
+        df_encoded = encode_ordinal_string(df_encoded, ordinal_string_cols)
+    if nominal_string_cols:
+        df_encoded = encode_nominal_string(df_encoded, nominal_string_cols)
+
+    # 정규화
+    df_encoded = normalization_handler(df_encoded, numerical_cols=numerical_cols, scaler_type='minmax')
+
+    # 저장
+    output_file = 'preprocessed_' + input_file
+    df_encoded.to_csv(output_file, index=False)
+    return output_file
+
 # 🔥 전체 파이프라인 실행 예시 (아래 코드 추가)
 
 # 1단계: 고유값 확인
