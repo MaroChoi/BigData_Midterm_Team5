@@ -237,7 +237,7 @@ def some_function(input_file):
     return output_path
 
 # 🔥 전체 파이프라인 실행 예시 (아래 코드 추가)
-df = pd.read_csv('C:/BigData_Midterm_Team5/BigData_Midterm_Team5/시험 문제 1번/1_adults.csv')
+df = pd.read_csv('C:\BigData_Midterm_Team5\BigData_Midterm_Team5\시험 문제 1번\1_adults.csv')
 # 1단계: 고유값 확인
 inspect_unique_values(df)
 
