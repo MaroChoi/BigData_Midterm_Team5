@@ -100,7 +100,6 @@ refractoring:
 
 
 refractoring: 목표에 더 적합한 파생변수를 만들었을 것이다.
-예시: 교수님이 시간이 더 있었으면 어떤 부분에 신경을 더 써서 진행했어야 했는지
 
 # 6번 문제 Readme
 사용 모델 : Linear Regression
