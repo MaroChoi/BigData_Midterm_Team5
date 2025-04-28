@@ -85,12 +85,11 @@ refractoring:
 
 # 4번 문제 Readme
 사용 모델 : 
-모델에 따른 정규화 :
-칼럼 선택
-파생변수 생성:
+모델에 따른 정규화 : StandardScaler
+칼럼 선택 : selected_columns = ['Age', 'SMS_received', 'AppointmentDay', 'No-show']
+파생변수 생성 : df_selected['Probability_of_Noshow'] = df_selected['Age'] / (df_selected['SMS_received'] + 1)
 
-refractoring:
-예시: 교수님이 시간이 더 있었으면 어떤 부분에 신경을 더 써서 진행했어야 했는지
+refractoring : 날짜형 데이터를 사용하여 파생변수를 만들었을 것이다.
 
 # 5번 문제 Readme
 사용 모델 : 
