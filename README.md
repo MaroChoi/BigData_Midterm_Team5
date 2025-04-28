@@ -41,8 +41,7 @@ selected_columns = [
 ]
 파생변수 생성: df_selected['work_hours_per_year'] = df_selected['hours.per.week'] * 52
 
-refractoring:
-
+refractoring: 
 
 # 2번 문제 Readme
 사용 모델 : 
@@ -90,12 +89,14 @@ refractoring:
 예시: 교수님이 시간이 더 있었으면 어떤 부분에 신경을 더 써서 진행했어야 했는지
 
 # 6번 문제 Readme
-사용 모델 : 
-모델에 따른 정규화 :
-칼럼 선택
-파생변수 생성:
+사용 모델 : Linear Regression
+모델에 따른 정규화 : MinMaxScaler
+칼럼 선택 : selected_columns = ['Invoice', 'StockCode', 'Description', 'Quantity', 'InvoiceDate', 'Price', 'Customer ID', 'Country']
+파생변수 생성 : df_selected['TotalAmount'] = df_selected['Quantity'] * df_selected['Price']
 
-refractoring: 
+
+refractoring: 시간이 없어서 그룹화의 부분에 큰 신경을 쓰지는 못했다. 좀 더 시간을 썼다면, 그룹화의 기준을 더 세분화 하는데 집중했을 것 같다.
+
 예시: 교수님이 시간이 더 있었으면 어떤 부분에 신경을 더 써서 진행했어야 했는지
 
 # 7번 문제 Readme
