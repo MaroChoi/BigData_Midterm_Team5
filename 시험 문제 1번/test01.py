@@ -315,3 +315,7 @@ df_encoded.to_csv(output_path, index=False)
 output_path = 'final_preprocessed_data.csv'
 df_encoded.to_csv(output_path, index=False)
 print(f"\n✅ 최종 데이터 저장 완료: {output_path}")
+
+# 최종 값
+input_file = 'C:/BigData_Midterm_Team5/BigData_Midterm_Team5/시험 문제 1번/1_adults.csv'
+output_file = some_function(input_file)

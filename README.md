@@ -31,17 +31,31 @@ LogisticRegression, LinearRegression: 정규화 필요
 기타 컬럼: 'Unknown'으로 대체
 
 # 1번 문제 Readme
-사용 모델 : 
-모델에 따른 정규화 :
+사용 모델 : Logistic Regression
+모델에 따른 정규화 : StandardScaler 사용
 칼럼 선택:
-파생변수 생성:
+selected_columns = [
+    'age', 'workclass', 'education', 'education.num',
+    'marital.status', 'occupation', 'relationship',
+    'race', 'sex', 'hours.per.week', 'native.country', 'income'
+]
+파생변수 생성: df_selected['work_hours_per_year'] = df_selected['hours.per.week'] * 52
 
 
 # 2번 문제 Readme
 사용 모델 : 
 모델에 따른 정규화 :
-칼럼 선택
+칼럼 선택： 
+    selected_columns = ['LIMIT_BAL','AGE','MARRIAGE','SEX','EDUCATION','default.payment.next.month']
+
 파생변수 생성:
+    # 한도 대비 나이 비율
+    df_selected['LIMIT_PER_AGE'] = df_selected['LIMIT_BAL'] / (df_selected['AGE'] + 1)
+    # 나이 그룹
+    df_selected['AGE_GROUP'] = pd.cut(df_selected['AGE'],bins=[0, 29, 39, 120],labels=['20s', '30s', '40+'])# 3. 결혼 여부 이진화
+    df_selected['IS_MARRIED'] = (df_selected['MARRIAGE'] == 1).astype(int)
+    #고학력 여부 이진화
+    df_selected['IS_HIGH_EDU'] = df_selected['EDUCATION'].isin([1,2]).astype(int)
 
 
 # 3번 문제 Readme

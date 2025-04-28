@@ -266,6 +266,10 @@ df_selected['Probability_of_Noshow'] = df_selected['Age'] / (df_selected['SMS_re
 # 3단계: 수치형 컬럼만 이상치 제거 (IQR)
 df_selected = remove_outliers_iqr(df_selected, [col for col in numerical_cols if col in df_selected.columns])
 
+# 5단계: EDA 실행
+eda_numerical_cols = [col for col in numerical_cols if col in df_selected.columns] + ['Probability_of_Noshow']
+run_eda(df_selected, numerical_cols=eda_numerical_cols)
+
 # 5개 그룹 재분리
 numerical_cols_selected = [col for col in numerical_cols if col in df_selected.columns]
 ordinal_numeric_cols_selected = [col for col in ordinal_numeric_cols if col in df_selected.columns]
