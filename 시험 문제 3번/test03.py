@@ -244,15 +244,15 @@ inspect_unique_values(df)
 
 
 # 컬럼 직접 구분
-numerical_cols_selected = [
+numerical_cols= [
     'price','minimum_nights','number_of_reviews','reviews_per_month',
     'calculated_host_listings_count','availability_365','number_of_reviews_ltm',
     'latitude','longitude'
 ]
-ordinal_numeric_cols_selected = []
-nominal_numeric_cols_selected = ['id','host_id']          # 식별자
-ordinal_string_cols_selected  = []
-nominal_string_cols_selected  = ['neighbourhood_group','neighbourhood','room_type','license','host_name']
+ordinal_numeric_cols = []
+nominal_numeric_cols = ['id','host_id']          # 식별자
+ordinal_string_cols = []
+nominal_string_cols  = ['neighbourhood_group','neighbourhood','room_type','license','host_name']
 
 
 # 2단계: 결측치 처리
@@ -261,7 +261,7 @@ df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_
 # 원하는 컬럼만 선택해서 새로운 DataFrame 만들기
 selected_columns = [
     'id', 'name', 'host_id', 'host_name','price','minimum_nights','number_of_reviews','reviews_per_month',
-    'calculated_host_listings_count','availability_365','number_of_reviews_ltm','neighbourhood_group','neighbourhood'
+    'calculated_host_listings_count','availability_365','last_review','neighbourhood_group','neighbourhood'
 ]
 df_selected = df[selected_columns]
 
@@ -269,7 +269,28 @@ df_selected = df[selected_columns]
 df_selected = drop_unknown_or_nan_rows(df_selected)
 
 # 파생변수 생성 / gpt에 물어봐서 추가
-df_selected['새로운_파생변수'] = df_selected['원하는 컬럼1'] / (df_selected['원하는 컬럼2'] + 1)
+# 예약 가능 여부 (타깃)
+df_selected['reservation_possible'] = (df_selected['availability_365'] > 0).astype(int)
+
+# 연간 잠재 수익 = price × availability_365
+df_selected['annual_potential_revenue'] = df_selected['price'] * df_selected['availability_365']
+
+# 마지막 리뷰 → days_since_last_review
+# 1) last_review 컬럼을 확실히 datetime 타입으로 변환
+df_selected['last_review'] = pd.to_datetime(df_selected['last_review'], errors='coerce')
+# 2) 현재 시점을 Timestamp.now() 로 얻어 와서 뺀 뒤 .dt.days 로 일수만 추출
+now = pd.Timestamp.now()
+df_selected['days_since_last_review'] = (
+    now - df_selected['last_review']
+).dt.days.fillna(-1).astype(int)
+
+#지역 인기도
+freq = df_selected['neighbourhood'].value_counts()
+df_selected['neighbourhood_freq'] = df_selected['neighbourhood'].map(freq)
+
+# 인덱스 중복 검사
+dupe_idx = df_selected.index[df_selected.index.duplicated()]
+print("중복된 인덱스 레이블:", dupe_idx.unique())
 
 # 3단계: 수치형 컬럼만 이상치 제거 (IQR)
 df_selected = remove_outliers_iqr(df_selected, [col for col in numerical_cols if col in df_selected.columns])
@@ -280,7 +301,7 @@ ordinal_numeric_cols_selected = [col for col in ordinal_numeric_cols if col in d
 nominal_numeric_cols_selected = [col for col in nominal_numeric_cols if col in df_selected.columns]
 ordinal_string_cols_selected = [col for col in ordinal_string_cols if col in df_selected.columns]
 nominal_string_cols_selected = [col for col in nominal_string_cols if col in df_selected.columns]
-
+'''
 # 새로 만든 파생변수 추가
 numerical_cols_selected.append('새로운_파생변수')
 
