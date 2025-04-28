@@ -20,9 +20,10 @@ RandomForestClassifier, LogisticRegression, LinearRegression
 RandomForestClassifier: 정규화 불필요
 LogisticRegression, LinearRegression: 정규화 필요
 사용 정규화 방법: MinMaxScaler 또는 StandardScaler 선택 가능 (scaler_type 설정)
+웬만하면 StandardScaler 사용
 
 # 결측치 처리 방법:
-결측치 처리 방법
+결측치 처리 방법 
 컬럼별 결측치 비율 40% 초과 시 해당 컬럼 삭제
 나머지 결측치는 다음 기준으로 대체:
 수치형 컬럼: 중앙값(median) 대체
