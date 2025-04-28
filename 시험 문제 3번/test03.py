@@ -236,7 +236,11 @@ def some_function(input_file):
         df_encoded = encode_nominal_string(df_encoded, nominal_string_cols_selected)
 
     # 정규화 (※ 여기 수정!!)
-    df_encoded = normalization_handler(df_encoded, numerical_cols=numerical_cols_selected, scaler_type='standard')
+    scaler_type = 'standard'  # 'minmax' 또는 'standard' 중 선택 가능
+    standard_col = ['price',
+    "minimum_nights"
+    "availability_365"]
+    df_encoded = normalization_handler(df_encoded, numerical_cols_selected, scaler_type=scaler_type)
 
     # ✨ (필요하면 여기서 target 추가 가능)
 
@@ -325,6 +329,9 @@ if nominal_string_cols_selected:
 
 # 5단계: 정규화 적용 (수치형 컬럼 기준, MinMaxScaler 또는 StandardScaler(logistic regression, linear regression) 선택)
 scaler_type = 'standard'  # 'minmax' 또는 'standard' 중 선택 가능
+standard_col = ['price',
+"minimum_nights"
+"availability_365"]
 df_encoded = normalization_handler(df_encoded, numerical_cols_selected, scaler_type=scaler_type)
 
 # 결과 확인
@@ -342,4 +349,4 @@ output_path = 'final_preprocessed_data.csv'
 df_encoded.to_csv(output_path, index=False)
 print(f"\n✅ 최종 데이터 저장 완료: {output_path}")
 
-#some_function('3_AB.csv')
+some_function('3_AB.csv')
