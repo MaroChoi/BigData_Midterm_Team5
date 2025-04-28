@@ -94,11 +94,12 @@ refractoring:
 
 # 5번 문제 Readme
 사용 모델 : 
-모델에 따른 정규화 :
-칼럼 선택
-파생변수 생성:
+모델에 따른 정규화 : MinMaxScaler
+칼럼 선택: selected_columns = ['overall', 'potential', 'value_eur']
+파생변수 생성: df_selected['value_per_rating'] = df_selected['value_eur'] / df_selected['overall']
 
-refractoring: 
+
+refractoring: 목표에 더 적합한 파생변수를 만들었을 것이다.
 예시: 교수님이 시간이 더 있었으면 어떤 부분에 신경을 더 써서 진행했어야 했는지
 
 # 6번 문제 Readme
