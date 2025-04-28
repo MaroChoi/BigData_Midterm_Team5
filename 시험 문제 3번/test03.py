@@ -172,11 +172,15 @@ def some_function(input_file):
     import os
 
     # 사용자 지정 부분 (원하는 컬럼들)
-    numerical_cols = ['수치형 컬럼1', '수치형 컬럼2']  # ✨ 수정 필요
+    numerical_cols= [
+    'price','minimum_nights','number_of_reviews','reviews_per_month',
+    'calculated_host_listings_count','availability_365','number_of_reviews_ltm',
+    'latitude','longitude'
+    ]
     ordinal_numeric_cols = []
-    nominal_numeric_cols = []
+    nominal_numeric_cols = ['id','host_id']          # 식별자
     ordinal_string_cols = []
-    nominal_string_cols = []
+    nominal_string_cols  = ['neighbourhood_group','neighbourhood','room_type','license','host_name']
 
     # 파일 불러오기
     df = pd.read_csv(input_file)
@@ -185,17 +189,28 @@ def some_function(input_file):
     df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_numeric_cols, ordinal_string_cols, nominal_string_cols)
 
     # 필요한 컬럼만 선택
-    selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']  # ✨ 수정 필요
+    selected_columns = [
+    'id', 'name', 'host_id', 'host_name','price','minimum_nights','number_of_reviews','reviews_per_month',
+    'calculated_host_listings_count','availability_365','last_review','neighbourhood_group','neighbourhood'
+    ]
     df_selected = df[selected_columns]
 
     # 이상치 제거
-    df_selected = remove_outliers_iqr(df_selected, numerical_cols=[col for col in numerical_cols if col in df_selected.columns])
+    outliers_col=['price','minimum_nights','availability_365']
+    df_selected = remove_outliers_iqr(df_selected, numerical_cols=[col for col in numerical_cols if col in outliers_col])
 
     # Unknown/Nan 행 삭제
     df_selected = drop_unknown_or_nan_rows(df_selected)
 
     # ✨ 파생변수 추가
-    df_selected['새로운_파생변수'] = df_selected['원하는 컬럼1'] / (df_selected['원하는 컬럼2'] + 1)
+    df_selected['reservation_possible'] = (df_selected['availability_365'] > 0).astype(int)
+
+    # 연간 잠재 수익 = price × availability_365
+    df_selected['annual_potential_revenue'] = df_selected['price'] * df_selected['availability_365']
+
+    #지역 인기도
+    freq = df_selected['neighbourhood'].value_counts()
+    df_selected['neighbourhood_freq'] = df_selected['neighbourhood'].map(freq)
 
     # 5개 그룹 재분리 (※ 여기 중요)
     numerical_cols_selected = [col for col in numerical_cols if col in df_selected.columns]
@@ -205,7 +220,9 @@ def some_function(input_file):
     nominal_string_cols_selected = [col for col in nominal_string_cols if col in df_selected.columns]
 
     # 새로 만든 파생변수 추가
-    numerical_cols_selected.append('새로운_파생변수')
+    numerical_cols_selected.extend([
+    'annual_potential_revenue','days_since_last_review','reservation_possible'
+    ])
 
     # 4단계: 범주형 인코딩
     df_encoded = df_selected.copy()
@@ -219,7 +236,7 @@ def some_function(input_file):
         df_encoded = encode_nominal_string(df_encoded, nominal_string_cols_selected)
 
     # 정규화 (※ 여기 수정!!)
-    df_encoded = normalization_handler(df_encoded, numerical_cols=numerical_cols_selected, scaler_type='minmax')
+    df_encoded = normalization_handler(df_encoded, numerical_cols=numerical_cols_selected, scaler_type='standard')
 
     # ✨ (필요하면 여기서 target 추가 가능)
 
@@ -275,25 +292,13 @@ df_selected['reservation_possible'] = (df_selected['availability_365'] > 0).asty
 # 연간 잠재 수익 = price × availability_365
 df_selected['annual_potential_revenue'] = df_selected['price'] * df_selected['availability_365']
 
-# 마지막 리뷰 → days_since_last_review
-# 1) last_review 컬럼을 확실히 datetime 타입으로 변환
-df_selected['last_review'] = pd.to_datetime(df_selected['last_review'], errors='coerce')
-# 2) 현재 시점을 Timestamp.now() 로 얻어 와서 뺀 뒤 .dt.days 로 일수만 추출
-now = pd.Timestamp.now()
-df_selected['days_since_last_review'] = (
-    now - df_selected['last_review']
-).dt.days.fillna(-1).astype(int)
-
 #지역 인기도
 freq = df_selected['neighbourhood'].value_counts()
 df_selected['neighbourhood_freq'] = df_selected['neighbourhood'].map(freq)
 
-# 인덱스 중복 검사
-dupe_idx = df_selected.index[df_selected.index.duplicated()]
-print("중복된 인덱스 레이블:", dupe_idx.unique())
-
 # 3단계: 수치형 컬럼만 이상치 제거 (IQR)
-df_selected = remove_outliers_iqr(df_selected, [col for col in numerical_cols if col in df_selected.columns])
+outliers_col=['price','minimum_nights','availability_365']
+df_selected = remove_outliers_iqr(df_selected, [col for col in numerical_cols if col in outliers_col])
 
 # 5개 그룹 재분리
 numerical_cols_selected = [col for col in numerical_cols if col in df_selected.columns]
@@ -301,9 +306,11 @@ ordinal_numeric_cols_selected = [col for col in ordinal_numeric_cols if col in d
 nominal_numeric_cols_selected = [col for col in nominal_numeric_cols if col in df_selected.columns]
 ordinal_string_cols_selected = [col for col in ordinal_string_cols if col in df_selected.columns]
 nominal_string_cols_selected = [col for col in nominal_string_cols if col in df_selected.columns]
-'''
+
 # 새로 만든 파생변수 추가
-numerical_cols_selected.append('새로운_파생변수')
+numerical_cols_selected.extend([
+    'annual_potential_revenue','days_since_last_review','reservation_possible'
+])
 
 # 4단계: 범주형 인코딩
 df_encoded = df_selected.copy()
@@ -317,7 +324,7 @@ if nominal_string_cols_selected:
     df_encoded = encode_nominal_string(df_encoded, nominal_string_cols_selected)
 
 # 5단계: 정규화 적용 (수치형 컬럼 기준, MinMaxScaler 또는 StandardScaler(logistic regression, linear regression) 선택)
-scaler_type = 'minmax'  # 'minmax' 또는 'standard' 중 선택 가능
+scaler_type = 'standard'  # 'minmax' 또는 'standard' 중 선택 가능
 df_encoded = normalization_handler(df_encoded, numerical_cols_selected, scaler_type=scaler_type)
 
 # 결과 확인
@@ -335,5 +342,4 @@ output_path = 'final_preprocessed_data.csv'
 df_encoded.to_csv(output_path, index=False)
 print(f"\n✅ 최종 데이터 저장 완료: {output_path}")
 
-테스트
-'''
+#some_function('3_AB.csv')
