@@ -172,11 +172,12 @@ def some_function(input_file):
     import os
 
     # 사용자 지정 부분 (원하는 컬럼들)
-    numerical_cols = ['수치형 컬럼1', '수치형 컬럼2']  # ✨ 수정 필요
-    ordinal_numeric_cols = []
-    nominal_numeric_cols = []
+    numerical_cols = ['Age']
+    ordinal_numeric_cols = ['Handcap', 'SMS_received']
+    nominal_numeric_cols = ['Scholarship', 'Hipertension', 'Diabetes', 'Alcoholism']
     ordinal_string_cols = []
-    nominal_string_cols = []
+    nominal_string_cols = ['Gender', 'Neighbourhood', 'No-show']
+    datetime_cols = ['ScheduledDay', 'AppointmentDay']  # 날짜형은 별도로 관리 (필요하면 따로 전처리)
 
     # 파일 불러오기
     df = pd.read_csv(input_file)
@@ -185,7 +186,7 @@ def some_function(input_file):
     df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_numeric_cols, ordinal_string_cols, nominal_string_cols)
 
     # 필요한 컬럼만 선택
-    selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']  # ✨ 수정 필요
+    selected_columns = ['Age', 'SMS_received', 'AppointmentDay', 'No-show']
     df_selected = df[selected_columns]
 
     # 이상치 제거
@@ -195,7 +196,7 @@ def some_function(input_file):
     df_selected = drop_unknown_or_nan_rows(df_selected)
 
     # ✨ 파생변수 추가
-    df_selected['새로운_파생변수'] = df_selected['원하는 컬럼1'] / (df_selected['원하는 컬럼2'] + 1)
+    df_selected['Probability_of_Noshow'] = df_selected['Age'] / (df_selected['SMS_received'] + 1)
 
     # 5개 그룹 재분리 (※ 여기 중요)
     numerical_cols_selected = [col for col in numerical_cols if col in df_selected.columns]
@@ -205,7 +206,7 @@ def some_function(input_file):
     nominal_string_cols_selected = [col for col in nominal_string_cols if col in df_selected.columns]
 
     # 새로 만든 파생변수 추가
-    numerical_cols_selected.append('새로운_파생변수')
+    numerical_cols_selected.append('Probability_of_Noshow')
 
     # 4단계: 범주형 인코딩
     df_encoded = df_selected.copy()
@@ -219,9 +220,10 @@ def some_function(input_file):
         df_encoded = encode_nominal_string(df_encoded, nominal_string_cols_selected)
 
     # 정규화 (※ 여기 수정!!)
-    df_encoded = normalization_handler(df_encoded, numerical_cols=numerical_cols_selected, scaler_type='minmax')
+    df_encoded = normalization_handler(df_encoded, numerical_cols=numerical_cols_selected, scaler_type='standard')
 
     # ✨ (필요하면 여기서 target 추가 가능)
+
 
     # 최종 저장
     save_folder = os.path.expanduser('~/Downloads')  # 맥북 기본 Downloads 폴더
@@ -237,29 +239,29 @@ def some_function(input_file):
     return output_path
 
 # 🔥 전체 파이프라인 실행 예시 (아래 코드 추가)
-df = pd.read_csv('파일')
+df = pd.read_csv('C:/BigData_Midterm_Team5/BigData_Midterm_Team5/시험 문제 4번/4_MED_NS.csv')
 # 1단계: 고유값 확인
 inspect_unique_values(df)
 
-# 컬럼 직접 구분
-numerical_cols = ['수치형 컬럼 이름1', '수치형 컬럼 이름2']
-ordinal_numeric_cols = ['범주형(숫자, 순서 상관 있음) 컬럼 이름1']
-nominal_numeric_cols = ['범주형(숫자, 순서 상관 없음) 컬럼 이름1']
-ordinal_string_cols = ['범주형(명목, 순서 상관 있음) 컬럼 이름1']
-nominal_string_cols = ['범주형(명목, 순서 없음) 컬럼 이름1']
-'''
+numerical_cols = ['Age']
+ordinal_numeric_cols = ['Handcap', 'SMS_received']
+nominal_numeric_cols = ['Scholarship', 'Hipertension', 'Diabetes', 'Alcoholism']
+ordinal_string_cols = []
+nominal_string_cols = ['Gender', 'Neighbourhood', 'No-show']
+datetime_cols = ['ScheduledDay', 'AppointmentDay']  # 이건 별도로 관리
+
 # 2단계: 결측치 처리
 df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_numeric_cols, ordinal_string_cols, nominal_string_cols)
 
 # 원하는 컬럼만 선택해서 새로운 DataFrame 만들기
-selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']
+selected_columns = ['Age', 'SMS_received', 'No-show', 'AppointmentDay']
 df_selected = df[selected_columns]
 
 # 추가: unkown+nan 제거
 df_selected = drop_unknown_or_nan_rows(df_selected)
 
 # 파생변수 생성 / gpt에 물어봐서 추가
-df_selected['새로운_파생변수'] = df_selected['원하는 컬럼1'] / (df_selected['원하는 컬럼2'] + 1)
+df_selected['Probability_of_Noshow'] = df_selected['Age'] / (df_selected['SMS_received'] + 1)
 
 # 3단계: 수치형 컬럼만 이상치 제거 (IQR)
 df_selected = remove_outliers_iqr(df_selected, [col for col in numerical_cols if col in df_selected.columns])
@@ -272,7 +274,7 @@ ordinal_string_cols_selected = [col for col in ordinal_string_cols if col in df_
 nominal_string_cols_selected = [col for col in nominal_string_cols if col in df_selected.columns]
 
 # 새로 만든 파생변수 추가
-numerical_cols_selected.append('새로운_파생변수')
+numerical_cols_selected.append('Probability_of_Noshow')
 
 # 4단계: 범주형 인코딩
 df_encoded = df_selected.copy()
@@ -286,7 +288,7 @@ if nominal_string_cols_selected:
     df_encoded = encode_nominal_string(df_encoded, nominal_string_cols_selected)
 
 # 5단계: 정규화 적용 (수치형 컬럼 기준, MinMaxScaler 또는 StandardScaler(logistic regression, linear regression) 선택)
-scaler_type = 'minmax'  # 'minmax' 또는 'standard' 중 선택 가능
+scaler_type = 'standard'  # 'minmax' 또는 'standard' 중 선택 가능
 df_encoded = normalization_handler(df_encoded, numerical_cols_selected, scaler_type=scaler_type)
 
 # 결과 확인
@@ -303,4 +305,3 @@ df_encoded.to_csv(output_path, index=False)
 output_path = 'final_preprocessed_data.csv'
 df_encoded.to_csv(output_path, index=False)
 print(f"\n✅ 최종 데이터 저장 완료: {output_path}")
-'''
