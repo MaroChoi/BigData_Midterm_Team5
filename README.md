@@ -72,7 +72,9 @@ refractoring: 당장은 만족하지만, 시간이 더 있다면, work_hours_per
 target 컬럼:
     target_col = 'default.payment.next.month'
 
-refractoring: target 커럼까지 지정할 수 있는 시간이 있었습니다. 다만 시간이 더 있다면 시각화하는 함수를 some_fuction() 안에 넣어 볼 수 있지 않을까 합니다.
+refractoring: 시간이 있었다면
+    1. 전처리 함수 some_function()에 시각화 기능 포함시키기  (전처리 및 데이터 시각화를 하나의 통합 함수로 만들어 작업 효율 향상)
+    2. Logistic Regression 모델 학습 이후 평가를 통해 Accuracy를 높이기 위해 추가적인 파생변수 생성, Feature Selection 등을 진행했을 것
 
 # 3번 문제 Readme
 사용 모델 : Classification
@@ -113,7 +115,6 @@ refractoring : 날짜형 데이터를 사용하여 파생변수를 만들었을 
 칼럼 선택: selected_columns = ['overall', 'potential', 'value_eur']
 파생변수 생성: df_selected['value_per_rating'] = df_selected['value_eur'] / df_selected['overall']
 
-
 refractoring: 목표에 더 적합한 파생변수를 만들었을 것이다.
 
 # 6번 문제 Readme
@@ -126,10 +127,13 @@ refractoring: 시간이 없어서 그룹화의 부분에 큰 신경을 쓰지는
 
 # 7번 문제 Readme
 사용 모델 : RandomForest
-모델에 따른 정규화 : minmax 로 했으나 RandomForest는 정규화가 엄청 필요하지는 않지만 정규화 작업이 필요하다고 판단이 되어서 처리했습니다.
+모델에 따른 정규화 : minmax / RandomForest는 정규화가 엄청 필요하지는 않지만 정규화 작업이 필요하다고 판단이 되어서 처리했습니다.
 칼럼 선택:
     selected_columns = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
 파생변수 생성:
     df_selected['BP_CHOL_RATIO'] = df_selected['trestbps'] / (df_selected['chol'] + 1)
 
-refractoring: 시간이 더 있으면 시각화 하는 함수까지 사용하여 시각화 할 수 있게 만들겠습니다.
+refractoring: 시간이 더 있었다면
+    1. 빠르게 목적에 맞는 핵심 파생변수를 만들고, 추가로 필요한 변수를 탐색하여 성능 향상에 도움이 되는지 확인해보고 싶습니다.
+    2. 전처리 과정이 실제 데이터에 제대로 적용되었는지 최종적으로 점검하고, 이상치 제거, 범주형 인코딩, 정규화까지 모두 완벽하게 처리했는지 검토하고 싶었습니다.
+    3. 코드의 반복을 줄이고 전처리 파이프라인 some_function()과 시각화 파이프라인run_eda()을 사용하여 과정을 더 진행해보고 싶었습니다
