@@ -237,30 +237,36 @@ def some_function(input_file):
     return output_path
 
 # 🔥 전체 파이프라인 실행 예시 (아래 코드 추가)
-df = pd.read_csv('파일')
+df = pd.read_csv('C:/BigData_Midterm_Team5/BigData_Midterm_Team5/시험 문제 1번/1_adults.csv')
 # 1단계: 고유값 확인
 inspect_unique_values(df)
 
 # 컬럼 직접 구분
-numerical_cols = ['수치형 컬럼 이름1', '수치형 컬럼 이름2']
-ordinal_numeric_cols = ['범주형(숫자, 순서 상관 있음) 컬럼 이름1']
-nominal_numeric_cols = ['범주형(숫자, 순서 상관 없음) 컬럼 이름1']
-ordinal_string_cols = ['범주형(명목, 순서 상관 있음) 컬럼 이름1']
-nominal_string_cols = ['범주형(명목, 순서 없음) 컬럼 이름1']
-'''
+numerical_cols = ['age', 'capital-gain', 'capital-loss', 'hours-per-week']
+ordinal_numeric_cols = ['education-num']
+nominal_numeric_cols = ['fnlwgt']
+ordinal_string_cols = ['education']
+nominal_string_cols = ['workclass', 'marital-status', 'occupation', 'relationship', 'race', 'sex', 'native-country', 'income']
+
+
 # 2단계: 결측치 처리
 df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_numeric_cols, ordinal_string_cols, nominal_string_cols)
 
 # 원하는 컬럼만 선택해서 새로운 DataFrame 만들기
-selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']
+selected_columns = [
+    'age', 'workclass', 'education', 'education-num',
+    'marital-status', 'occupation', 'relationship',
+    'race', 'sex', 'hours-per-week', 'native-country', 'income'
+]
 df_selected = df[selected_columns]
 
 # 추가: unkown+nan 제거
 df_selected = drop_unknown_or_nan_rows(df_selected)
 
-# 파생변수 생성 / gpt에 물어봐서 추가
-df_selected['새로운_파생변수'] = df_selected['원하는 컬럼1'] / (df_selected['원하는 컬럼2'] + 1)
-
+# 파생변수 생성 / gpt에 물어봐 
+# 주당 근로시간(hours-per-week) × 52주
+df_selected['work_hours_per_year'] = df_selected['hours-per-week'] * 52
+'''
 # 3단계: 수치형 컬럼만 이상치 제거 (IQR)
 df_selected = remove_outliers_iqr(df_selected, [col for col in numerical_cols if col in df_selected.columns])
 
