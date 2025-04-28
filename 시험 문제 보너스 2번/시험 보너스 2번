@@ -172,9 +172,9 @@ def some_function(input_file):
     import os
 
     # 사용자 지정 부분 (원하는 컬럼들)
-    numerical_cols = ['수치형 컬럼1', '수치형 컬럼2']  # ✨ 수정 필요
-    ordinal_numeric_cols = []
-    nominal_numeric_cols = []
+    numerical_cols = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
+    ordinal_numeric_cols = ['cp', 'restecg', 'slope', 'ca', 'thal']
+    nominal_numeric_cols = ['sex', 'fbs', 'exang']
     ordinal_string_cols = []
     nominal_string_cols = []
 
@@ -184,19 +184,16 @@ def some_function(input_file):
     # 결측치 및 중복 처리
     df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_numeric_cols, ordinal_string_cols, nominal_string_cols)
 
-    # 필요한 컬럼만 선택
-    selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']  # ✨ 수정 필요
+    # 원하는 컬럼만 선택해서 새로운 DataFrame 만들기
+    selected_columns = ['age', 'trestbps', 'chol', 'thalach', 'oldpeak']
     df_selected = df[selected_columns]
 
-    # 이상치 제거
-    df_selected = remove_outliers_iqr(df_selected, numerical_cols=[col for col in numerical_cols if col in df_selected.columns])
-
-    # Unknown/Nan 행 삭제
+    # 추가: unknown+nan 제거
     df_selected = drop_unknown_or_nan_rows(df_selected)
 
-    # ✨ 파생변수 추가
-    df_selected['새로운_파생변수'] = df_selected['원하는 컬럼1'] / (df_selected['원하는 컬럼2'] + 1)
-
+    # 파생변수 생성 (목적: 심장질환 조기 예측에 도움되는 변수)
+    # 예시: 혈압 대비 콜레스테롤 비율 (trestbps/chol)
+    df_selected['BP_CHOL_RATIO'] = df_selected['trestbps'] / (df_selected['chol'] + 1)
     # 5개 그룹 재분리 (※ 여기 중요)
     numerical_cols_selected = [col for col in numerical_cols if col in df_selected.columns]
     ordinal_numeric_cols_selected = [col for col in ordinal_numeric_cols if col in df_selected.columns]
@@ -205,7 +202,7 @@ def some_function(input_file):
     nominal_string_cols_selected = [col for col in nominal_string_cols if col in df_selected.columns]
 
     # 새로 만든 파생변수 추가
-    numerical_cols_selected.append('새로운_파생변수')
+    numerical_cols_selected.append('BP_CHOL_RATIO')
 
     # 4단계: 범주형 인코딩
     df_encoded = df_selected.copy()
@@ -271,7 +268,7 @@ ordinal_string_cols_selected = [col for col in ordinal_string_cols if col in df_
 nominal_string_cols_selected = [col for col in nominal_string_cols if col in df_selected.columns]
 
 # 새로 만든 파생변수 추가
-numerical_cols_selected.append('새로운_파생변수')
+numerical_cols_selected.append('BP_CHOL_RATIO')
 
 # 4단계: 범주형 인코딩
 df_encoded = df_selected.copy()
@@ -302,3 +299,9 @@ df_encoded.to_csv(output_path, index=False)
 output_path = 'final_preprocessed_data.csv'
 df_encoded.to_csv(output_path, index=False)
 print(f"\n✅ 최종 데이터 저장 완료: {output_path}")
+
+
+
+# 최종 값
+input_file = '/Users/imsu-in/Downloads/myproject/midtermtest/BigData_Midterm_Team5/BigData_Midterm_Team5-8/7_heart.csv'
+output_file = some_function(input_file)
