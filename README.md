@@ -41,6 +41,8 @@ selected_columns = [
 ]
 파생변수 생성: df_selected['work_hours_per_year'] = df_selected['hours.per.week'] * 52
 
+refractoring:
+
 
 # 2번 문제 Readme
 사용 모델 : 
@@ -57,6 +59,8 @@ selected_columns = [
     #고학력 여부 이진화
     df_selected['IS_HIGH_EDU'] = df_selected['EDUCATION'].isin([1,2]).astype(int)
 
+refractoring:
+예시: 교수님이 시간이 더 있었으면 어떤 부분에 신경을 더 써서 진행했어야 했는지
 
 # 3번 문제 Readme
 사용 모델 : 
@@ -64,6 +68,8 @@ selected_columns = [
 칼럼 선택
 파생변수 생성:
 
+refractoring:
+예시: 교수님이 시간이 더 있었으면 어떤 부분에 신경을 더 써서 진행했어야 했는지
 
 # 4번 문제 Readme
 사용 모델 : 
@@ -71,9 +77,32 @@ selected_columns = [
 칼럼 선택
 파생변수 생성:
 
+refractoring:
+예시: 교수님이 시간이 더 있었으면 어떤 부분에 신경을 더 써서 진행했어야 했는지
 
 # 5번 문제 Readme
 사용 모델 : 
 모델에 따른 정규화 :
 칼럼 선택
 파생변수 생성:
+
+refractoring: 
+예시: 교수님이 시간이 더 있었으면 어떤 부분에 신경을 더 써서 진행했어야 했는지
+
+# 6번 문제 Readme
+사용 모델 : 
+모델에 따른 정규화 :
+칼럼 선택
+파생변수 생성:
+
+refractoring: 
+예시: 교수님이 시간이 더 있었으면 어떤 부분에 신경을 더 써서 진행했어야 했는지
+
+# 7번 문제 Readme
+사용 모델 : 
+모델에 따른 정규화 :
+칼럼 선택
+파생변수 생성:
+
+refractoring: 
+예시: 교수님이 시간이 더 있었으면 어떤 부분에 신경을 더 써서 진행했어야 했는지
