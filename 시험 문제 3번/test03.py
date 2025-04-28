@@ -237,10 +237,12 @@ def some_function(input_file):
     return output_path
 
 # 🔥 전체 파이프라인 실행 예시 (아래 코드 추가)
-df = pd.read_csv('파일')
+df = pd.read_csv('3_AB.csv')
 # 1단계: 고유값 확인
+print(df.head())
 inspect_unique_values(df)
 
+'''
 # 컬럼 직접 구분
 numerical_cols = ['수치형 컬럼 이름1', '수치형 컬럼 이름2']
 ordinal_numeric_cols = ['범주형(숫자, 순서 상관 있음) 컬럼 이름1']
@@ -248,7 +250,7 @@ nominal_numeric_cols = ['범주형(숫자, 순서 상관 없음) 컬럼 이름1'
 ordinal_string_cols = ['범주형(명목, 순서 상관 있음) 컬럼 이름1']
 nominal_string_cols = ['범주형(명목, 순서 없음) 컬럼 이름1']
 
-'''
+
 # 2단계: 결측치 처리
 df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_numeric_cols, ordinal_string_cols, nominal_string_cols)
 
