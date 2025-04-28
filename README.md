@@ -15,40 +15,50 @@ normalization_handler(df, numerical_cols, scaler_type)	수치형 컬럼 정규�
 run_eda(df, numerical_cols, categorical_cols)	히트맵, 박스플롯, 분포플롯, 상관관계 히트맵 등을 시각화
 some_function(input_file)	상기 모든 과정을 종합하여 최종 전처리된 CSV 파일 생성
 
+# 사용 모델:
+RandomForestClassifier, LogisticRegression, LinearRegression
+RandomForestClassifier: 정규화 불필요
+LogisticRegression, LinearRegression: 정규화 필요
+사용 정규화 방법: MinMaxScaler 또는 StandardScaler 선택 가능 (scaler_type 설정)
+
+# 결측치 처리 방법:
+결측치 처리 방법
+컬럼별 결측치 비율 40% 초과 시 해당 컬럼 삭제
+나머지 결측치는 다음 기준으로 대체:
+수치형 컬럼: 중앙값(median) 대체
+순서형/명목형 범주형 컬럼: 최빈값(mode) 대체
+기타 컬럼: 'Unknown'으로 대체
+
 # 1번 문제 Readme
 사용 모델 : 
 모델에 따른 정규화 :
-결측치 처리 방법
-
-
+칼럼 선택:
+파생변수 생성:
 
 
 # 2번 문제 Readme
 사용 모델 : 
 모델에 따른 정규화 :
-결측치 처리 방법
-
-
-
+칼럼 선택
+파생변수 생성:
 
 
 # 3번 문제 Readme
 사용 모델 : 
 모델에 따른 정규화 :
-결측치 처리 방법
-
-
+칼럼 선택
+파생변수 생성:
 
 
 # 4번 문제 Readme
 사용 모델 : 
 모델에 따른 정규화 :
-결측치 처리 방법
-
-
+칼럼 선택
+파생변수 생성:
 
 
 # 5번 문제 Readme
 사용 모델 : 
 모델에 따른 정규화 :
-결측치 처리 방법
+칼럼 선택
+파생변수 생성:
