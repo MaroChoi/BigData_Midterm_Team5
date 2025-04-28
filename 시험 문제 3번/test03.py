@@ -304,4 +304,6 @@ df_encoded.to_csv(output_path, index=False)
 output_path = 'final_preprocessed_data.csv'
 df_encoded.to_csv(output_path, index=False)
 print(f"\n✅ 최종 데이터 저장 완료: {output_path}")
+
+테스트 푸쉬
 '''
