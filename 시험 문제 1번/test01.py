@@ -247,7 +247,7 @@ ordinal_numeric_cols = ['범주형(숫자, 순서 상관 있음) 컬럼 이름1'
 nominal_numeric_cols = ['범주형(숫자, 순서 상관 없음) 컬럼 이름1']
 ordinal_string_cols = ['범주형(명목, 순서 상관 있음) 컬럼 이름1']
 nominal_string_cols = ['범주형(명목, 순서 없음) 컬럼 이름1']
-
+'''
 # 2단계: 결측치 처리
 df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_numeric_cols, ordinal_string_cols, nominal_string_cols)
 
@@ -303,3 +303,4 @@ df_encoded.to_csv(output_path, index=False)
 output_path = 'final_preprocessed_data.csv'
 df_encoded.to_csv(output_path, index=False)
 print(f"\n✅ 최종 데이터 저장 완료: {output_path}")
+'''
