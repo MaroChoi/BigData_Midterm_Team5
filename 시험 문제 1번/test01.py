@@ -237,16 +237,16 @@ def some_function(input_file):
     return output_path
 
 # 🔥 전체 파이프라인 실행 예시 (아래 코드 추가)
-df = pd.read_csv('C:\BigData_Midterm_Team5\BigData_Midterm_Team5\시험 문제 1번\1_adults.csv')
+df = pd.read_csv('C:/BigData_Midterm_Team5/BigData_Midterm_Team5/시험 문제 1번/1_adults.csv')
 # 1단계: 고유값 확인
 inspect_unique_values(df)
 
 # 컬럼 직접 구분
-numerical_cols = ['age', 'capital-gain', 'capital-loss', 'hours-per-week']
-ordinal_numeric_cols = ['education-num']
-nominal_numeric_cols = ['fnlwgt']
+numerical_cols = ['age', 'hours.per.week']
+ordinal_numeric_cols = ['education.num']
+nominal_numeric_cols = []
 ordinal_string_cols = ['education']
-nominal_string_cols = ['workclass', 'marital-status', 'occupation', 'relationship', 'race', 'sex', 'native-country', 'income']
+nominal_string_cols = ['workclass', 'marital.status', 'occupation', 'relationship', 'race', 'sex', 'native.country', 'income']
 
 
 # 2단계: 결측치 처리
@@ -254,9 +254,9 @@ df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_
 
 # 원하는 컬럼만 선택해서 새로운 DataFrame 만들기
 selected_columns = [
-    'age', 'workclass', 'education', 'education-num',
-    'marital-status', 'occupation', 'relationship',
-    'race', 'sex', 'hours-per-week', 'native-country', 'income'
+    'age', 'workclass', 'education', 'education.num',
+    'marital.status', 'occupation', 'relationship',
+    'race', 'sex', 'hours.per.week', 'native.country', 'income'
 ]
 df_selected = df[selected_columns]
 
@@ -265,10 +265,15 @@ df_selected = drop_unknown_or_nan_rows(df_selected)
 
 # 파생변수 생성 / gpt에 물어봐 
 # 주당 근로시간(hours-per-week) × 52주
-df_selected['work_hours_per_year'] = df_selected['hours-per-week'] * 52
-'''
+df_selected['work_hours_per_year'] = df_selected['hours.per.week'] * 52
+
+
 # 3단계: 수치형 컬럼만 이상치 제거 (IQR)
 df_selected = remove_outliers_iqr(df_selected, [col for col in numerical_cols if col in df_selected.columns])
+
+# 5단계: EDA 실행
+eda_numerical_cols = [col for col in numerical_cols if col in df_selected.columns] + ['work_hours_per_year']
+run_eda(df_selected, numerical_cols=eda_numerical_cols)
 
 # 5개 그룹 재분리
 numerical_cols_selected = [col for col in numerical_cols if col in df_selected.columns]
@@ -278,7 +283,7 @@ ordinal_string_cols_selected = [col for col in ordinal_string_cols if col in df_
 nominal_string_cols_selected = [col for col in nominal_string_cols if col in df_selected.columns]
 
 # 새로 만든 파생변수 추가
-numerical_cols_selected.append('새로운_파생변수')
+numerical_cols_selected.append('work_hours_per_year')
 
 # 4단계: 범주형 인코딩
 df_encoded = df_selected.copy()
@@ -292,7 +297,7 @@ if nominal_string_cols_selected:
     df_encoded = encode_nominal_string(df_encoded, nominal_string_cols_selected)
 
 # 5단계: 정규화 적용 (수치형 컬럼 기준, MinMaxScaler 또는 StandardScaler(logistic regression, linear regression) 선택)
-scaler_type = 'minmax'  # 'minmax' 또는 'standard' 중 선택 가능
+scaler_type = 'standard'  # 'minmax' 또는 'standard' 중 선택 가능
 df_encoded = normalization_handler(df_encoded, numerical_cols_selected, scaler_type=scaler_type)
 
 # 결과 확인
@@ -309,4 +314,3 @@ df_encoded.to_csv(output_path, index=False)
 output_path = 'final_preprocessed_data.csv'
 df_encoded.to_csv(output_path, index=False)
 print(f"\n✅ 최종 데이터 저장 완료: {output_path}")
-'''
