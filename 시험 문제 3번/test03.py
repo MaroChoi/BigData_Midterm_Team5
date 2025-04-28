@@ -242,20 +242,27 @@ df = pd.read_csv('3_AB.csv')
 print(df.head())
 inspect_unique_values(df)
 
-'''
+
 # 컬럼 직접 구분
-numerical_cols = ['수치형 컬럼 이름1', '수치형 컬럼 이름2']
-ordinal_numeric_cols = ['범주형(숫자, 순서 상관 있음) 컬럼 이름1']
-nominal_numeric_cols = ['범주형(숫자, 순서 상관 없음) 컬럼 이름1']
-ordinal_string_cols = ['범주형(명목, 순서 상관 있음) 컬럼 이름1']
-nominal_string_cols = ['범주형(명목, 순서 없음) 컬럼 이름1']
+numerical_cols_selected = [
+    'price','minimum_nights','number_of_reviews','reviews_per_month',
+    'calculated_host_listings_count','availability_365','number_of_reviews_ltm',
+    'latitude','longitude'
+]
+ordinal_numeric_cols_selected = []
+nominal_numeric_cols_selected = ['id','host_id']          # 식별자
+ordinal_string_cols_selected  = []
+nominal_string_cols_selected  = ['neighbourhood_group','neighbourhood','room_type','license','host_name']
 
 
 # 2단계: 결측치 처리
 df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_numeric_cols, ordinal_string_cols, nominal_string_cols)
 
 # 원하는 컬럼만 선택해서 새로운 DataFrame 만들기
-selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']
+selected_columns = [
+    'id', 'name', 'host_id', 'host_name','price','minimum_nights','number_of_reviews','reviews_per_month',
+    'calculated_host_listings_count','availability_365','number_of_reviews_ltm','neighbourhood_group','neighbourhood'
+]
 df_selected = df[selected_columns]
 
 # 추가: unkown+nan 제거
