@@ -9,7 +9,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.metrics import accuracy_score, confusion_matrix, classification_report, r2_score, mean_squared_error
 
-
 import matplotlib.pyplot as plt  # EDA 시각화용
 import seaborn as sns            # EDA 시각화용
 
@@ -167,16 +166,39 @@ def normalization_handler(df, numerical_cols, scaler_type='minmax'):
     df[numerical_cols] = scaler.fit_transform(df[numerical_cols])
     return df
 
-
 def some_function(input_file):
     import os
 
     # 사용자 지정 부분 (원하는 컬럼들)
-    numerical_cols = ['수치형 컬럼1', '수치형 컬럼2']  # ✨ 수정 필요
+    numerical_cols = ['age', 'height_cm', 'weight_kg', 'league_rank',
+    'overall', 'potential', 'value_eur', 'wage_eur',
+    'international_reputation', 'weak_foot', 'skill_moves',
+    'release_clause_eur', 'pace', 'shooting', 'passing',
+    'dribbling', 'defending', 'physic',
+    'gk_diving', 'gk_handling', 'gk_kicking', 'gk_reflexes', 'gk_speed', 'gk_positioning',
+    'attacking_crossing', 'attacking_finishing', 'attacking_heading_accuracy',
+    'attacking_short_passing', 'attacking_volleys', 'skill_dribbling', 'skill_curve',
+    'skill_fk_accuracy', 'skill_long_passing', 'skill_ball_control',
+    'movement_acceleration', 'movement_sprint_speed', 'movement_agility',
+    'movement_reactions', 'movement_balance', 'power_shot_power', 'power_jumping',
+    'power_stamina', 'power_strength', 'power_long_shots', 'mentality_aggression',
+    'mentality_interceptions', 'mentality_positioning', 'mentality_vision',
+    'mentality_penalties', 'mentality_composure', 'defending_marking',
+    'defending_standing_tackle', 'defending_sliding_tackle',
+    'goalkeeping_diving', 'goalkeeping_handling', 'goalkeeping_kicking',
+    'goalkeeping_positioning', 'goalkeeping_reflexes',
+    'ls','st','rs','lw','lf','cf','rf','rw',
+    'lam','cam','ram','lm','lcm','cm','rcm','rm',
+    'lwb','ldm','cdm','rdm','rwb',
+    'lb','lcb','cb','rcb','rb']  # ✨ 수정 필요
     ordinal_numeric_cols = []
-    nominal_numeric_cols = []
-    ordinal_string_cols = []
-    nominal_string_cols = []
+    nominal_numeric_cols = ['team_jersey_number', 'nation_jersey_number']
+    ordinal_string_cols = ['work_rate']
+    nominal_string_cols = ['sofifa_id', 'player_url', 'short_name', 'long_name', 'dob',
+    'nationality', 'club_name', 'league_name', 'player_positions',
+    'preferred_foot', 'body_type', 'real_face', 'player_tags',
+    'team_position', 'loaned_from', 'joined', 'contract_valid_until',
+    'nation_position', 'player_traits']
 
     # 파일 불러오기
     df = pd.read_csv(input_file)
@@ -185,18 +207,17 @@ def some_function(input_file):
     df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_numeric_cols, ordinal_string_cols, nominal_string_cols)
 
     # 필요한 컬럼만 선택
-    selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']  # ✨ 수정 필요
+    selected_columns = ['overall', 'potential', 'value_eur']  # ✨ 수정 필요
     df_selected = df[selected_columns]
+
+    df_selected['value_per_rating'] = df_selected['value_eur'] / df_selected['overall']
 
     # 이상치 제거
     df_selected = remove_outliers_iqr(df_selected, numerical_cols=[col for col in numerical_cols if col in df_selected.columns])
 
     # Unknown/Nan 행 삭제
     df_selected = drop_unknown_or_nan_rows(df_selected)
-
-    # ✨ 파생변수 추가
-    df_selected['새로운_파생변수'] = df_selected['원하는 컬럼1'] / (df_selected['원하는 컬럼2'] + 1)
-
+    
     # 5개 그룹 재분리 (※ 여기 중요)
     numerical_cols_selected = [col for col in numerical_cols if col in df_selected.columns]
     ordinal_numeric_cols_selected = [col for col in ordinal_numeric_cols if col in df_selected.columns]
@@ -205,7 +226,7 @@ def some_function(input_file):
     nominal_string_cols_selected = [col for col in nominal_string_cols if col in df_selected.columns]
 
     # 새로 만든 파생변수 추가
-    numerical_cols_selected.append('새로운_파생변수')
+    numerical_cols_selected.append('value_per_rating')
 
     # 4단계: 범주형 인코딩
     df_encoded = df_selected.copy()
@@ -236,71 +257,42 @@ def some_function(input_file):
 
     return output_path
 
-# 🔥 전체 파이프라인 실행 예시 (아래 코드 추가)
-df = pd.read_csv('파일')
-# 1단계: 고유값 확인
-inspect_unique_values(df)
 
-# 컬럼 직접 구분
-numerical_cols = ['수치형 컬럼 이름1', '수치형 컬럼 이름2']
-ordinal_numeric_cols = ['범주형(숫자, 순서 상관 있음) 컬럼 이름1']
-nominal_numeric_cols = ['범주형(숫자, 순서 상관 없음) 컬럼 이름1']
-ordinal_string_cols = ['범주형(명목, 순서 상관 있음) 컬럼 이름1']
-nominal_string_cols = ['범주형(명목, 순서 없음) 컬럼 이름1']
-'''
-# 2단계: 결측치 처리
-df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_numeric_cols, ordinal_string_cols, nominal_string_cols)
+# 시각화
+df = pd.read_csv('/Users/imsu-in/Downloads/myproject/midtermtest/BigData_Midterm_Team5/BigData_Midterm_Team5-8/시험 문제 5번/5_SOCCER.csv')
+numerical_cols = ['age', 'height_cm', 'weight_kg', 'league_rank',
+    'overall', 'potential', 'value_eur', 'wage_eur',
+    'international_reputation', 'weak_foot', 'skill_moves',
+    'release_clause_eur', 'pace', 'shooting', 'passing',
+    'dribbling', 'defending', 'physic',
+    'gk_diving', 'gk_handling', 'gk_kicking', 'gk_reflexes', 'gk_speed', 'gk_positioning',
+    'attacking_crossing', 'attacking_finishing', 'attacking_heading_accuracy',
+    'attacking_short_passing', 'attacking_volleys', 'skill_dribbling', 'skill_curve',
+    'skill_fk_accuracy', 'skill_long_passing', 'skill_ball_control',
+    'movement_acceleration', 'movement_sprint_speed', 'movement_agility',
+    'movement_reactions', 'movement_balance', 'power_shot_power', 'power_jumping',
+    'power_stamina', 'power_strength', 'power_long_shots', 'mentality_aggression',
+    'mentality_interceptions', 'mentality_positioning', 'mentality_vision',
+    'mentality_penalties', 'mentality_composure', 'defending_marking',
+    'defending_standing_tackle', 'defending_sliding_tackle',
+    'goalkeeping_diving', 'goalkeeping_handling', 'goalkeeping_kicking',
+    'goalkeeping_positioning', 'goalkeeping_reflexes',
+    'ls','st','rs','lw','lf','cf','rf','rw',
+    'lam','cam','ram','lm','lcm','cm','rcm','rm',
+    'lwb','ldm','cdm','rdm','rwb',
+    'lb','lcb','cb','rcb','rb']
+ordinal_numeric_cols = []
+nominal_numeric_cols = ['team_jersey_number', 'nation_jersey_number']
+ordinal_string_cols = ['work_rate']
+nominal_string_cols = [ 'sofifa_id', 'player_url', 'short_name', 'long_name', 'dob',
+    'nationality', 'club_name', 'league_name', 'player_positions',
+    'preferred_foot', 'body_type', 'real_face', 'player_tags',
+    'team_position', 'loaned_from', 'joined', 'contract_valid_until',
+    'nation_position', 'player_traits']
+run_eda(df, numerical_cols, categorical_cols=None)
 
-# 원하는 컬럼만 선택해서 새로운 DataFrame 만들기
-selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']
-df_selected = df[selected_columns]
 
-# 추가: unkown+nan 제거
-df_selected = drop_unknown_or_nan_rows(df_selected)
 
-# 파생변수 생성 / gpt에 물어봐서 추가
-df_selected['새로운_파생변수'] = df_selected['원하는 컬럼1'] / (df_selected['원하는 컬럼2'] + 1)
-
-# 3단계: 수치형 컬럼만 이상치 제거 (IQR)
-df_selected = remove_outliers_iqr(df_selected, [col for col in numerical_cols if col in df_selected.columns])
-
-# 5개 그룹 재분리
-numerical_cols_selected = [col for col in numerical_cols if col in df_selected.columns]
-ordinal_numeric_cols_selected = [col for col in ordinal_numeric_cols if col in df_selected.columns]
-nominal_numeric_cols_selected = [col for col in nominal_numeric_cols if col in df_selected.columns]
-ordinal_string_cols_selected = [col for col in ordinal_string_cols if col in df_selected.columns]
-nominal_string_cols_selected = [col for col in nominal_string_cols if col in df_selected.columns]
-
-# 새로 만든 파생변수 추가
-numerical_cols_selected.append('새로운_파생변수')
-
-# 4단계: 범주형 인코딩
-df_encoded = df_selected.copy()
-if ordinal_numeric_cols_selected:
-    df_encoded = encode_ordinal_numeric(df_encoded, ordinal_numeric_cols_selected)
-if nominal_numeric_cols_selected:
-    df_encoded = encode_nominal_numeric(df_encoded, nominal_numeric_cols_selected)
-if ordinal_string_cols_selected:
-    df_encoded = encode_ordinal_string(df_encoded, ordinal_string_cols_selected)
-if nominal_string_cols_selected:
-    df_encoded = encode_nominal_string(df_encoded, nominal_string_cols_selected)
-
-# 5단계: 정규화 적용 (수치형 컬럼 기준, MinMaxScaler 또는 StandardScaler(logistic regression, linear regression) 선택)
-scaler_type = 'minmax'  # 'minmax' 또는 'standard' 중 선택 가능
-df_encoded = normalization_handler(df_encoded, numerical_cols_selected, scaler_type=scaler_type)
-
-# 결과 확인
-print("\n✅ 최종 데이터프레임:")
-print(df_encoded.head())
-
-# 최종 저장
-save_folder = os.path.expanduser('~/Downloads')  # 맥북 기본 Downloads 폴더
-save_filename = 'final_preprocessed_data.csv'
-output_path = os.path.join(save_folder, save_filename)
-df_encoded.to_csv(output_path, index=False)
-
-# ✨ 최종 데이터 저장
-output_path = 'final_preprocessed_data.csv'
-df_encoded.to_csv(output_path, index=False)
-print(f"\n✅ 최종 데이터 저장 완료: {output_path}")
-'''
+# 최종 값
+input_file = '/Users/imsu-in/Downloads/myproject/midtermtest/BigData_Midterm_Team5/BigData_Midterm_Team5-8/시험 문제 5번/5_SOCCER.csv'
+output_file = some_function(input_file)
