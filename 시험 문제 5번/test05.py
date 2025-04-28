@@ -292,7 +292,6 @@ nominal_string_cols = [ 'sofifa_id', 'player_url', 'short_name', 'long_name', 'd
 run_eda(df, numerical_cols, categorical_cols=None)
 
 
-
 # 최종 값
 input_file = '/Users/imsu-in/Downloads/myproject/midtermtest/BigData_Midterm_Team5/BigData_Midterm_Team5-8/시험 문제 5번/5_SOCCER.csv'
 output_file = some_function(input_file)
