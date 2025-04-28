@@ -172,9 +172,9 @@ def some_function(input_file):
     import os
 
     # 사용자 지정 부분 (원하는 컬럼들)
-    numerical_cols = ['수치형 컬럼1', '수치형 컬럼2']  # ✨ 수정 필요
-    ordinal_numeric_cols = []
-    nominal_numeric_cols = []
+    numerical_cols = ['LIMIT_BAL', 'AGE','BILL_AMT1', 'BILL_AMT2', 'BILL_AMT3','BILL_AMT4', 'BILL_AMT5', 'BILL_AMT6','PAY_AMT1', 'PAY_AMT2', 'PAY_AMT3','PAY_AMT4', 'PAY_AMT5', 'PAY_AMT6']
+    ordinal_numeric_cols = ['PAY_0', 'PAY_2', 'PAY_3', 'PAY_4', 'PAY_5', 'PAY_6']
+    nominal_numeric_cols = ['SEX', 'EDUCATION', 'MARRIAGE']
     ordinal_string_cols = []
     nominal_string_cols = []
 
@@ -185,7 +185,7 @@ def some_function(input_file):
     df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_numeric_cols, ordinal_string_cols, nominal_string_cols)
 
     # 필요한 컬럼만 선택
-    selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']  # ✨ 수정 필요
+    selected_columns = ['LIMIT_BAL','AGE','MARRIAGE','SEX','EDUCATION','default.payment.next.month']
     df_selected = df[selected_columns]
 
     # 이상치 제거
@@ -195,7 +195,13 @@ def some_function(input_file):
     df_selected = drop_unknown_or_nan_rows(df_selected)
 
     # ✨ 파생변수 추가
-    df_selected['새로운_파생변수'] = df_selected['원하는 컬럼1'] / (df_selected['원하는 컬럼2'] + 1)
+    # 한도 대비 나이 비율
+    df_selected['LIMIT_PER_AGE'] = df_selected['LIMIT_BAL'] / (df_selected['AGE'] + 1)
+    # 나이 그룹
+    df_selected['AGE_GROUP'] = pd.cut(df_selected['AGE'],bins=[0, 29, 39, 120],labels=['20s', '30s', '40+'])# 3. 결혼 여부 이진화
+    df_selected['IS_MARRIED'] = (df_selected['MARRIAGE'] == 1).astype(int)
+    #고학력 여부 이진화
+    df_selected['IS_HIGH_EDU'] = df_selected['EDUCATION'].isin([1,2]).astype(int)
 
     # 5개 그룹 재분리 (※ 여기 중요)
     numerical_cols_selected = [col for col in numerical_cols if col in df_selected.columns]
@@ -205,7 +211,11 @@ def some_function(input_file):
     nominal_string_cols_selected = [col for col in nominal_string_cols if col in df_selected.columns]
 
     # 새로 만든 파생변수 추가
-    numerical_cols_selected.append('새로운_파생변수')
+    # 새로 만든 파생변수 추가
+    numerical_cols_selected.append('LIMIT_PER_AGE')
+    ordinal_string_cols_selected.append('AGE_GROUP')
+    nominal_numeric_cols_selected.append('IS_MARRIED')
+    nominal_numeric_cols_selected.append('IS_HIGH_EDU')
 
     # 4단계: 범주형 인코딩
     df_encoded = df_selected.copy()
@@ -222,6 +232,11 @@ def some_function(input_file):
     df_encoded = normalization_handler(df_encoded, numerical_cols=numerical_cols_selected, scaler_type='minmax')
 
     # ✨ (필요하면 여기서 target 추가 가능)
+    # Target 컬럼
+    target_col = 'default.payment.next.month'
+    # Feature, Target 나누기
+    X = df.drop(columns=[target_col])
+    y = df[target_col]
 
     # 최종 저장
     save_folder = os.path.expanduser('~/Downloads')  # 맥북 기본 Downloads 폴더
@@ -237,71 +252,17 @@ def some_function(input_file):
     return output_path
 
 # 🔥 전체 파이프라인 실행 예시 (아래 코드 추가)
-df = pd.read_csv('파일')
-# 1단계: 고유값 확인
-inspect_unique_values(df)
-
+df = pd.read_csv('/Users/imsu-in/Downloads/myproject/midtermtest/BigData_Midterm_Team5/BigData_Midterm_Team5-8/시험 문제 2번/2_Card.csv')
 # 컬럼 직접 구분
-numerical_cols = ['수치형 컬럼 이름1', '수치형 컬럼 이름2']
-ordinal_numeric_cols = ['범주형(숫자, 순서 상관 있음) 컬럼 이름1']
-nominal_numeric_cols = ['범주형(숫자, 순서 상관 없음) 컬럼 이름1']
-ordinal_string_cols = ['범주형(명목, 순서 상관 있음) 컬럼 이름1']
-nominal_string_cols = ['범주형(명목, 순서 없음) 컬럼 이름1']
-'''
-# 2단계: 결측치 처리
-df = missing_value_handler_v2(df, numerical_cols, ordinal_numeric_cols, nominal_numeric_cols, ordinal_string_cols, nominal_string_cols)
+numerical_cols = ['LIMIT_BAL', 'AGE','BILL_AMT1', 'BILL_AMT2', 'BILL_AMT3','BILL_AMT4', 'BILL_AMT5', 'BILL_AMT6','PAY_AMT1', 'PAY_AMT2', 'PAY_AMT3','PAY_AMT4', 'PAY_AMT5', 'PAY_AMT6']
+ordinal_numeric_cols = ['PAY_0', 'PAY_2', 'PAY_3', 'PAY_4', 'PAY_5', 'PAY_6']
+nominal_numeric_cols = ['SEX', 'EDUCATION', 'MARRIAGE']
+ordinal_string_cols = []
+nominal_string_cols = []
+run_eda(df, numerical_cols, categorical_cols=None)
 
-# 원하는 컬럼만 선택해서 새로운 DataFrame 만들기
-selected_columns = ['원하는 컬럼1', '원하는 컬럼2', '원하는 컬럼3']
-df_selected = df[selected_columns]
 
-# 추가: unkown+nan 제거
-df_selected = drop_unknown_or_nan_rows(df_selected)
 
-# 파생변수 생성 / gpt에 물어봐서 추가
-df_selected['새로운_파생변수'] = df_selected['원하는 컬럼1'] / (df_selected['원하는 컬럼2'] + 1)
-
-# 3단계: 수치형 컬럼만 이상치 제거 (IQR)
-df_selected = remove_outliers_iqr(df_selected, [col for col in numerical_cols if col in df_selected.columns])
-
-# 5개 그룹 재분리
-numerical_cols_selected = [col for col in numerical_cols if col in df_selected.columns]
-ordinal_numeric_cols_selected = [col for col in ordinal_numeric_cols if col in df_selected.columns]
-nominal_numeric_cols_selected = [col for col in nominal_numeric_cols if col in df_selected.columns]
-ordinal_string_cols_selected = [col for col in ordinal_string_cols if col in df_selected.columns]
-nominal_string_cols_selected = [col for col in nominal_string_cols if col in df_selected.columns]
-
-# 새로 만든 파생변수 추가
-numerical_cols_selected.append('새로운_파생변수')
-
-# 4단계: 범주형 인코딩
-df_encoded = df_selected.copy()
-if ordinal_numeric_cols_selected:
-    df_encoded = encode_ordinal_numeric(df_encoded, ordinal_numeric_cols_selected)
-if nominal_numeric_cols_selected:
-    df_encoded = encode_nominal_numeric(df_encoded, nominal_numeric_cols_selected)
-if ordinal_string_cols_selected:
-    df_encoded = encode_ordinal_string(df_encoded, ordinal_string_cols_selected)
-if nominal_string_cols_selected:
-    df_encoded = encode_nominal_string(df_encoded, nominal_string_cols_selected)
-
-# 5단계: 정규화 적용 (수치형 컬럼 기준, MinMaxScaler 또는 StandardScaler(logistic regression, linear regression) 선택)
-scaler_type = 'minmax'  # 'minmax' 또는 'standard' 중 선택 가능
-df_encoded = normalization_handler(df_encoded, numerical_cols_selected, scaler_type=scaler_type)
-
-# 결과 확인
-print("\n✅ 최종 데이터프레임:")
-print(df_encoded.head())
-
-# 최종 저장
-save_folder = os.path.expanduser('~/Downloads')  # 맥북 기본 Downloads 폴더
-save_filename = 'final_preprocessed_data.csv'
-output_path = os.path.join(save_folder, save_filename)
-df_encoded.to_csv(output_path, index=False)
-
-# ✨ 최종 데이터 저장
-output_path = 'final_preprocessed_data.csv'
-df_encoded.to_csv(output_path, index=False)
-print(f"\n✅ 최종 데이터 저장 완료: {output_path}")
-수인dfd
-'''
+# 최종 값
+input_file = '/Users/imsu-in/Downloads/myproject/midtermtest/BigData_Midterm_Team5/BigData_Midterm_Team5-8/시험 문제 2번/2_Card.csv'
+output_file = some_function(input_file)
